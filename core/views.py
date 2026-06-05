@@ -111,7 +111,7 @@ def webhook_nova_venda(request):
         return JsonResponse({'status': 'error', 'detail': 'Pedido not found in site db'}, status=404)
     except Exception as exc:
         logger.exception('Webhook import error for site pedido %s', pedido_id)
-        return JsonResponse({'status': 'error', 'detail': str(exc)}, status=500)
+        return JsonResponse({'status': 'error', 'detail': 'Internal server error'}, status=500)
 
     return JsonResponse({'status': 'ok', 'criado': criado, 'pedido_id': str(pedido.id)})
 

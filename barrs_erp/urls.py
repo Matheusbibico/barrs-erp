@@ -3,11 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from core.views import dashboard
+from core.views import dashboard, webhook_nova_venda
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', dashboard, name='dashboard'),
+    path('webhook/nova-venda/', webhook_nova_venda, name='webhook_nova_venda'),
     path('api/', include([
         path('produtos/', include('produtos.urls')),
         path('clientes/', include('clientes.urls')),

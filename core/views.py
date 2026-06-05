@@ -1,15 +1,33 @@
+import hmac
 import json
+import logging
 from datetime import timedelta
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-from pedidos.models import LucroPedido, Pedido
+from clientes.models import Cliente
+from core.site_models import SitePedido
+from pedidos.models import ItemPedido, LucroPedido, Pagamento, Pedido
 from produtos.models import Produto
+
+logger = logging.getLogger(__name__)
+
+_STATUS_MAP = {
+    'pendente': Pedido.STATUS_AGUARDANDO,
+    'confirmado': Pedido.STATUS_PAGO,
+    'enviado': Pedido.STATUS_ENVIADO,
+    'entregue': Pedido.STATUS_ENTREGUE,
+    'cancelado': Pedido.STATUS_CANCELADO,
+}
 
 
 @staff_member_required
@@ -68,3 +86,35 @@ def dashboard(request):
         'grafico_labels': json.dumps(labels),
         'grafico_dados': json.dumps(dados),
     })
+
+
+@csrf_exempt
+@require_POST
+def webhook_nova_venda(request):
+    token = request.META.get('HTTP_X_WEBHOOK_TOKEN', '')
+    expected = getattr(settings, 'WEBHOOK_TOKEN', '')
+    if not expected or not hmac.compare_digest(token, expected):
+        return JsonResponse({'status': 'error', 'detail': 'Unauthorized'}, status=401)
+
+    try:
+        body = json.loads(request.body)
+        pedido_id = int(body['pedido_id'])
+    except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+        return JsonResponse({'status': 'error', 'detail': 'pedido_id required'}, status=400)
+
+    if 'site' not in settings.DATABASES:
+        return JsonResponse({'status': 'error', 'detail': 'Site database not configured'}, status=503)
+
+    try:
+        pedido, criado = _importar_pedido_unico(pedido_id)
+    except SitePedido.DoesNotExist:
+        return JsonResponse({'status': 'error', 'detail': 'Pedido not found in site db'}, status=404)
+    except Exception as exc:
+        logger.exception('Webhook import error for site pedido %s', pedido_id)
+        return JsonResponse({'status': 'error', 'detail': str(exc)}, status=500)
+
+    return JsonResponse({'status': 'ok', 'criado': criado, 'pedido_id': str(pedido.id)})
+
+
+def _importar_pedido_unico(site_id):
+    raise NotImplementedError

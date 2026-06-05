@@ -106,6 +106,8 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
 
+WEBHOOK_TOKEN = config('WEBHOOK_TOKEN', default='')
+
 JAZZMIN_SETTINGS = {
     "site_title": "Barrs ERP",
     "site_header": "Barrs ERP",

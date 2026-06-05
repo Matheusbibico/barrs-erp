@@ -32,31 +32,55 @@ _STATUS_MAP = {
 
 @staff_member_required
 def dashboard(request):
+    from django.db.models import Avg, F, Sum
+    from clientes.models import Cliente
+
     hoje = timezone.localdate()
     inicio_mes = hoje.replace(day=1)
     trinta_dias_atras = hoje - timedelta(days=30)
 
-    faturamento_hoje = Pedido.objects.filter(
-        status='pago', criado_em__date=hoje,
-    ).aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
-
-    faturamento_mes = Pedido.objects.filter(
-        status='pago', criado_em__date__gte=inicio_mes,
-    ).aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
-
-    lucro_mes = LucroPedido.objects.filter(
-        pedido__criado_em__date__gte=inicio_mes,
-    ).aggregate(v=Sum('lucro_liquido'))['v'] or Decimal('0')
-
+    faturamento_hoje = (
+        Pedido.objects.filter(status='pago', criado_em__date=hoje)
+        .aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
+    )
+    faturamento_mes = (
+        Pedido.objects.filter(status='pago', criado_em__date__gte=inicio_mes)
+        .aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
+    )
+    lucro_mes = (
+        LucroPedido.objects.filter(pedido__criado_em__date__gte=inicio_mes)
+        .aggregate(v=Sum('lucro_liquido'))['v'] or Decimal('0')
+    )
     pedidos_pendentes = Pedido.objects.filter(
         status__in=['orcamento', 'reservado', 'aguardando_pagamento'],
     ).count()
+
+    ticket_medio_mes = (
+        Pedido.objects.filter(status='pago', criado_em__date__gte=inicio_mes)
+        .aggregate(v=Avg('total_liquido'))['v'] or Decimal('0')
+    )
+    clientes_ativos = Cliente.objects.filter(ativo=True).count()
 
     estoque_baixo = (
         Produto.objects
         .filter(status='ativo', estoque_total__lte=5)
         .select_related('categoria')
         .order_by('estoque_total')[:10]
+    )
+    estoque_total_ativos = Produto.objects.filter(status='ativo').count()
+    estoque_baixo_count = Produto.objects.filter(
+        status='ativo', estoque_total__gt=0, estoque_total__lte=5
+    ).count()
+    estoque_zerado_count = Produto.objects.filter(
+        status='ativo', estoque_total__lte=0
+    ).count()
+
+    top5_produtos = (
+        ItemPedido.objects
+        .filter(pedido__status='pago', pedido__criado_em__date__gte=trinta_dias_atras)
+        .values('produto__nome')
+        .annotate(qty=Sum('quantidade'), receita=Sum(F('preco_unitario') * F('quantidade')))
+        .order_by('-receita')[:5]
     )
 
     vendas_qs = (
@@ -67,14 +91,38 @@ def dashboard(request):
         .annotate(total=Sum('total_liquido'))
         .order_by('dia')
     )
+    lucro_qs = (
+        LucroPedido.objects
+        .filter(pedido__criado_em__date__gte=trinta_dias_atras)
+        .annotate(dia=TruncDate('pedido__criado_em'))
+        .values('dia')
+        .annotate(total=Sum('lucro_liquido'))
+        .order_by('dia')
+    )
     vendas_dict = {v['dia']: float(v['total']) for v in vendas_qs}
+    lucro_dict = {v['dia']: float(v['total']) for v in lucro_qs}
 
-    labels, dados = [], []
+    labels, dados, dados_lucro = [], [], []
     dia = trinta_dias_atras
     while dia <= hoje:
         labels.append(dia.strftime('%d/%m'))
         dados.append(vendas_dict.get(dia, 0))
+        dados_lucro.append(lucro_dict.get(dia, 0))
         dia += timedelta(days=1)
+
+    _CANAL_LABELS = {
+        'site': 'Site', 'whatsapp': 'WhatsApp', 'instagram': 'Instagram',
+        'presencial': 'Presencial', 'link': 'Link',
+    }
+    canal_qs = (
+        Pedido.objects
+        .filter(status='pago', criado_em__date__gte=inicio_mes)
+        .values('canal')
+        .annotate(total=Sum('total_liquido'))
+        .order_by('-total')
+    )
+    canal_labels = [_CANAL_LABELS.get(v['canal'], v['canal']) for v in canal_qs]
+    canal_dados = [float(v['total']) for v in canal_qs]
 
     return render(request, 'admin/dashboard.html', {
         'title': 'Dashboard',
@@ -82,9 +130,18 @@ def dashboard(request):
         'faturamento_mes': faturamento_mes,
         'lucro_mes': lucro_mes,
         'pedidos_pendentes': pedidos_pendentes,
+        'ticket_medio_mes': ticket_medio_mes,
+        'clientes_ativos': clientes_ativos,
         'estoque_baixo': estoque_baixo,
+        'estoque_total_ativos': estoque_total_ativos,
+        'estoque_baixo_count': estoque_baixo_count,
+        'estoque_zerado_count': estoque_zerado_count,
+        'top5_produtos': top5_produtos,
         'grafico_labels': json.dumps(labels),
         'grafico_dados': json.dumps(dados),
+        'grafico_lucro': json.dumps(dados_lucro),
+        'vendas_canal_labels': json.dumps(canal_labels),
+        'vendas_canal_dados': json.dumps(canal_dados),
     })
 
 

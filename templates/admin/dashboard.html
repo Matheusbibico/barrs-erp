@@ -5,19 +5,27 @@
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
 .kpi-card{background:var(--secondary,#fff);border:1px solid var(--border-color,#dee2e6);border-radius:6px;padding:1.25rem;text-align:center}
 .kpi-value{font-size:1.8rem;font-weight:700;color:var(--primary,#007bff)}
 .kpi-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--body-quiet-color,#888);margin-top:.25rem}
 .kpi-card.alerta .kpi-value{color:#e74c3c}
 .dash-section{background:var(--secondary,#fff);border:1px solid var(--border-color,#dee2e6);border-radius:6px;padding:1.25rem;margin-bottom:1.5rem}
 .dash-section h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.07em;color:var(--body-quiet-color,#888);margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-color,#dee2e6)}
+.dash-two-col{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.5rem}
+@media(max-width:768px){.dash-two-col{grid-template-columns:1fr}}
 #grafico-wrap{position:relative;height:280px}
+#grafico-canal-wrap{position:relative;height:280px}
 .est-table{width:100%;border-collapse:collapse;font-size:.9rem}
 .est-table th,.est-table td{text-align:left;padding:.45rem .75rem;border-bottom:1px solid var(--border-color,#dee2e6)}
 .est-table th{font-weight:600}
 .badge{padding:2px 8px;border-radius:4px;font-size:.75rem;color:#fff}
 .badge-danger{background:#e74c3c}.badge-warning{background:#f39c12}
+.mini-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.mini-kpi{text-align:center;padding:.75rem;border-radius:4px;background:var(--darkened-bg,#f8f9fa)}
+.mini-kpi .val{font-size:1.4rem;font-weight:700}
+.mini-kpi .lbl{font-size:.75rem;color:var(--body-quiet-color,#888);margin-top:.2rem}
+.mini-kpi.alerta .val{color:#e74c3c}
 </style>
 {% endblock %}
 
@@ -47,15 +55,63 @@
     <div class="kpi-value">{{ pedidos_pendentes }}</div>
     <div class="kpi-label">Pedidos Pendentes</div>
   </div>
+  <div class="kpi-card">
+    <div class="kpi-value">R$ {{ ticket_medio_mes|floatformat:2 }}</div>
+    <div class="kpi-label">Ticket Médio do Mês</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">{{ clientes_ativos }}</div>
+    <div class="kpi-label">Clientes Ativos</div>
+  </div>
+</div>
+
+<div class="dash-two-col">
+  <div class="dash-section" style="margin-bottom:0">
+    <h2>Vendas e Lucro — Últimos 30 Dias</h2>
+    <div id="grafico-wrap"><canvas id="graficoVendas"></canvas></div>
+  </div>
+  <div class="dash-section" style="margin-bottom:0">
+    <h2>Vendas por Canal — Mês Atual</h2>
+    <div id="grafico-canal-wrap"><canvas id="graficoCanel"></canvas></div>
+  </div>
 </div>
 
 <div class="dash-section">
-  <h2>Vendas — Últimos 30 Dias</h2>
-  <div id="grafico-wrap"><canvas id="graficoVendas"></canvas></div>
+  <h2>Top 5 Produtos — Últimos 30 Dias</h2>
+  {% if top5_produtos %}
+  <table class="est-table">
+    <thead><tr><th>Produto</th><th style="text-align:right">Qtd</th><th style="text-align:right">Receita</th></tr></thead>
+    <tbody>
+    {% for p in top5_produtos %}
+      <tr>
+        <td>{{ p.produto__nome|default:"—" }}</td>
+        <td style="text-align:right">{{ p.qty }}</td>
+        <td style="text-align:right">R$ {{ p.receita|floatformat:2 }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:var(--body-quiet-color)">Nenhuma venda registrada nos últimos 30 dias.</p>
+  {% endif %}
 </div>
 
 <div class="dash-section">
   <h2>Estoque Baixo (≤ 5 unidades)</h2>
+  <div class="mini-kpi-grid" style="margin-bottom:1rem">
+    <div class="mini-kpi">
+      <div class="val">{{ estoque_total_ativos }}</div>
+      <div class="lbl">Produtos Ativos</div>
+    </div>
+    <div class="mini-kpi {% if estoque_baixo_count > 0 %}alerta{% endif %}">
+      <div class="val">{{ estoque_baixo_count }}</div>
+      <div class="lbl">Estoque Baixo (1–5)</div>
+    </div>
+    <div class="mini-kpi {% if estoque_zerado_count > 0 %}alerta{% endif %}">
+      <div class="val">{{ estoque_zerado_count }}</div>
+      <div class="lbl">Zerados</div>
+    </div>
+  </div>
   {% if estoque_baixo %}
   <table class="est-table">
     <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Qtd</th></tr></thead>
@@ -66,7 +122,7 @@
         <td><a href="{% url 'admin:produtos_produto_change' p.pk %}">{{ p.nome }}</a></td>
         <td>{{ p.categoria.nome|default:"—" }}</td>
         <td>
-          {% if p.estoque_total == 0 %}<span class="badge badge-danger">Zerado</span>
+          {% if p.estoque_total <= 0 %}<span class="badge badge-danger">Zerado</span>
           {% else %}<span class="badge badge-warning">{{ p.estoque_total }}</span>{% endif %}
         </td>
       </tr>
@@ -80,27 +136,69 @@
 
 <script>
 (function(){
-  var ctx = document.getElementById('graficoVendas').getContext('2d');
-  new Chart(ctx, {
+  var ctx1 = document.getElementById('graficoVendas').getContext('2d');
+  new Chart(ctx1, {
     type: 'line',
     data: {
       labels: {{ grafico_labels|safe }},
-      datasets: [{
-        label: 'Faturamento (R$)',
-        data: {{ grafico_dados|safe }},
-        borderColor: '#4e73df',
-        backgroundColor: 'rgba(78,115,223,0.08)',
-        borderWidth: 2, fill: true, tension: 0.35, pointRadius: 2
-      }]
+      datasets: [
+        {
+          label: 'Faturamento (R$)',
+          data: {{ grafico_dados|safe }},
+          borderColor: '#4e73df',
+          backgroundColor: 'rgba(78,115,223,0.08)',
+          borderWidth: 2, fill: true, tension: 0.35, pointRadius: 2
+        },
+        {
+          label: 'Lucro Líquido (R$)',
+          data: {{ grafico_lucro|safe }},
+          borderColor: '#1cc88a',
+          backgroundColor: 'rgba(28,200,138,0.05)',
+          borderWidth: 2, fill: true, tension: 0.35, pointRadius: 2
+        }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: { legend: { display: true, position: 'top' } },
       scales: { y: { beginAtZero: true,
         ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } }
       }}
     }
   });
+
+  var ctx2 = document.getElementById('graficoCanel').getContext('2d');
+  var canalLabels = {{ vendas_canal_labels|safe }};
+  var canalDados = {{ vendas_canal_dados|safe }};
+  if (canalLabels.length > 0) {
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: canalLabels,
+        datasets: [{
+          data: canalDados,
+          backgroundColor: ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ' R$ ' + ctx.parsed.toLocaleString('pt-BR', {minimumFractionDigits:2});
+              }
+            }
+          }
+        }
+      }
+    });
+  } else {
+    document.getElementById('grafico-canal-wrap').innerHTML =
+      '<p style="text-align:center;color:var(--body-quiet-color);padding-top:2rem">Sem vendas no mês.</p>';
+  }
 })();
 </script>
 {% endblock %}

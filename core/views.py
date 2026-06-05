@@ -117,4 +117,81 @@ def webhook_nova_venda(request):
 
 
 def _importar_pedido_unico(site_id):
-    raise NotImplementedError
+    from django.db.models import F as _F
+
+    sp = SitePedido.objects.using('site').prefetch_related('itens__produto').get(pk=site_id)
+
+    status_erp = _STATUS_MAP.get(sp.status, Pedido.STATUS_ORCAMENTO)
+
+    if sp.email:
+        cliente, _ = Cliente.objects.get_or_create(
+            email=sp.email,
+            defaults={
+                'nome': sp.nome or sp.email,
+                'whatsapp': getattr(sp, 'telefone', ''),
+                'cidade': getattr(sp, 'cidade', ''),
+                'estado': getattr(sp, 'estado', ''),
+            },
+        )
+    else:
+        cliente, _ = Cliente.objects.get_or_create(
+            site_id=site_id,
+            defaults={'nome': sp.nome or f'site_{site_id}'},
+        )
+
+    ped, criado = Pedido.objects.get_or_create(
+        site_id=sp.id,
+        defaults={
+            'cliente': cliente,
+            'canal': Pedido.CANAL_SITE,
+            'status': status_erp,
+            'total_bruto': sp.subtotal,
+            'desconto': sp.desconto,
+            'frete': sp.frete,
+            'total_liquido': sp.total,
+        },
+    )
+
+    if not criado:
+        ped.status = status_erp
+        ped.total_liquido = sp.total
+        ped.save(update_fields=['status', 'total_liquido'])
+        return ped, False
+
+    placeholder, _ = Produto.objects.get_or_create(
+        sku='SITE-DESCONHECIDO',
+        defaults={
+            'nome': 'Produto não identificado (importado)',
+            'preco_venda': Decimal('0'),
+            'custo': Decimal('0'),
+            'status': Produto.STATUS_INATIVO,
+        },
+    )
+    prod_map = {p.site_id: p for p in Produto.objects.filter(site_id__isnull=False)}
+
+    for si in sp.itens.all():
+        produto = prod_map.get(si.produto_id) if si.produto_id else None
+        produto = produto or placeholder
+        ItemPedido.objects.create(
+            pedido=ped,
+            produto=produto,
+            quantidade=si.quantidade,
+            preco_unitario=si.preco_unitario,
+            custo_unitario=Decimal('0'),
+        )
+        if produto.sku != 'SITE-DESCONHECIDO':
+            Produto.objects.filter(pk=produto.pk).update(
+                estoque_total=_F('estoque_total') - si.quantidade
+            )
+
+    if status_erp == Pedido.STATUS_PAGO:
+        Pagamento.objects.get_or_create(
+            pedido=ped,
+            defaults={
+                'metodo': Pagamento.METODO_PIX,
+                'valor': sp.total,
+                'status': Pagamento.STATUS_APROVADO,
+            },
+        )
+
+    return ped, True

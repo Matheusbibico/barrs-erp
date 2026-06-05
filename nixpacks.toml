@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python312", "python312Packages.pip"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["python manage.py collectstatic --noinput"]
+
+[start]
+cmd = "gunicorn barrs_erp.wsgi --bind 0.0.0.0:$PORT --workers 2 --log-file -"

@@ -3,8 +3,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from core.views import dashboard
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dashboard/', dashboard, name='dashboard'),
     path('api/', include([
         path('produtos/', include('produtos.urls')),
         path('clientes/', include('clientes.urls')),

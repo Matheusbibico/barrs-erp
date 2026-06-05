@@ -58,6 +58,7 @@ class Pedido(TimeStampedModel):
     total_liquido = models.DecimalField('Total Líquido (R$)', max_digits=12, decimal_places=2, default=0)
     endereco_entrega = models.TextField('Endereço de Entrega', blank=True)
     observacoes = models.TextField('Observações', blank=True)
+    site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
 
     class Meta:
         verbose_name = 'Pedido'

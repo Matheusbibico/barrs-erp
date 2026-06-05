@@ -67,6 +67,10 @@ DATABASES = {
     )
 }
 
+_site_db_url = config('SITE_DATABASE_URL', default='')
+if _site_db_url:
+    DATABASES['site'] = dj_database_url.parse(_site_db_url, conn_max_age=60)
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -117,6 +121,7 @@ JAZZMIN_SETTINGS = {
         "pedidos.pedido",
     ],
     "topmenu_links": [
+        {"name": "Dashboard", "url": "/dashboard/"},
         {"name": "API", "url": "/api/", "new_window": True},
         {"name": "Home", "url": "admin:index"},
     ],

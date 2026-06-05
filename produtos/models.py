@@ -76,6 +76,7 @@ class Produto(TimeStampedModel):
         verbose_name='Fornecedor',
     )
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default=STATUS_ATIVO)
+    site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
 
     class Meta:
         verbose_name = 'Produto'

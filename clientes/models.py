@@ -14,6 +14,7 @@ class Cliente(TimeStampedModel):
     qtd_pedidos = models.PositiveIntegerField('Qtd. Pedidos', default=0)
     ativo = models.BooleanField('Ativo', default=True)
     observacoes = models.TextField('Observações', blank=True)
+    site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
 
     class Meta:
         verbose_name = 'Cliente'

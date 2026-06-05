@@ -1,0 +1,106 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi-card{background:var(--secondary,#fff);border:1px solid var(--border-color,#dee2e6);border-radius:6px;padding:1.25rem;text-align:center}
+.kpi-value{font-size:1.8rem;font-weight:700;color:var(--primary,#007bff)}
+.kpi-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--body-quiet-color,#888);margin-top:.25rem}
+.kpi-card.alerta .kpi-value{color:#e74c3c}
+.dash-section{background:var(--secondary,#fff);border:1px solid var(--border-color,#dee2e6);border-radius:6px;padding:1.25rem;margin-bottom:1.5rem}
+.dash-section h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.07em;color:var(--body-quiet-color,#888);margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-color,#dee2e6)}
+#grafico-wrap{position:relative;height:280px}
+.est-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.est-table th,.est-table td{text-align:left;padding:.45rem .75rem;border-bottom:1px solid var(--border-color,#dee2e6)}
+.est-table th{font-weight:600}
+.badge{padding:2px 8px;border-radius:4px;font-size:.75rem;color:#fff}
+.badge-danger{background:#e74c3c}.badge-warning{background:#f39c12}
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Início' %}</a> › Dashboard
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-value">R$ {{ faturamento_hoje|floatformat:2 }}</div>
+    <div class="kpi-label">Faturamento Hoje</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">R$ {{ faturamento_mes|floatformat:2 }}</div>
+    <div class="kpi-label">Faturamento do Mês</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">R$ {{ lucro_mes|floatformat:2 }}</div>
+    <div class="kpi-label">Lucro do Mês</div>
+  </div>
+  <div class="kpi-card {% if pedidos_pendentes > 0 %}alerta{% endif %}">
+    <div class="kpi-value">{{ pedidos_pendentes }}</div>
+    <div class="kpi-label">Pedidos Pendentes</div>
+  </div>
+</div>
+
+<div class="dash-section">
+  <h2>Vendas — Últimos 30 Dias</h2>
+  <div id="grafico-wrap"><canvas id="graficoVendas"></canvas></div>
+</div>
+
+<div class="dash-section">
+  <h2>Estoque Baixo (≤ 5 unidades)</h2>
+  {% if estoque_baixo %}
+  <table class="est-table">
+    <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Qtd</th></tr></thead>
+    <tbody>
+    {% for p in estoque_baixo %}
+      <tr>
+        <td><code>{{ p.sku }}</code></td>
+        <td><a href="{% url 'admin:produtos_produto_change' p.pk %}">{{ p.nome }}</a></td>
+        <td>{{ p.categoria.nome|default:"—" }}</td>
+        <td>
+          {% if p.estoque_total == 0 %}<span class="badge badge-danger">Zerado</span>
+          {% else %}<span class="badge badge-warning">{{ p.estoque_total }}</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:var(--body-quiet-color)">Nenhum produto com estoque baixo.</p>
+  {% endif %}
+</div>
+
+<script>
+(function(){
+  var ctx = document.getElementById('graficoVendas').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ grafico_labels|safe }},
+      datasets: [{
+        label: 'Faturamento (R$)',
+        data: {{ grafico_dados|safe }},
+        borderColor: '#4e73df',
+        backgroundColor: 'rgba(78,115,223,0.08)',
+        borderWidth: 2, fill: true, tension: 0.35, pointRadius: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true,
+        ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } }
+      }}
+    }
+  });
+})();
+</script>
+{% endblock %}

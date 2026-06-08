@@ -17,7 +17,7 @@ STATUS_CORES = {
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
     extra = 1
-    fields = ('produto', 'quantidade', 'preco_unitario', 'custo_unitario')
+    fields = ('produto', 'variacao', 'quantidade', 'preco_unitario', 'custo_unitario')
     autocomplete_fields = ['produto']
 
 

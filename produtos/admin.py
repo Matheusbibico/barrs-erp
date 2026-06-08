@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Categoria, Fornecedor, Produto, FotoProduto
+from .models import Categoria, Fornecedor, Produto, FotoProduto, VariacaoProduto
 
 
 @admin.register(Categoria)
@@ -26,6 +26,12 @@ class FotoProdutoInline(admin.TabularInline):
     fields = ('imagem', 'principal', 'ordem')
 
 
+class VariacaoProdutoInline(admin.TabularInline):
+    model = VariacaoProduto
+    extra = 1
+    fields = ('cor', 'tamanho', 'sku_variacao', 'custo', 'preco_venda', 'estoque', 'ativo')
+
+
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
     list_display = (
@@ -36,7 +42,7 @@ class ProdutoAdmin(admin.ModelAdmin):
     search_fields = ('sku', 'nome', 'descricao')
     list_select_related = ('categoria', 'fornecedor')
     readonly_fields = ('criado_em', 'atualizado_em')
-    inlines = [FotoProdutoInline]
+    inlines = [FotoProdutoInline, VariacaoProdutoInline]
     fieldsets = (
         ('Identificação', {'fields': ('sku', 'nome', 'categoria', 'fornecedor', 'status')}),
         ('Descrição', {'fields': ('descricao',)}),

@@ -97,6 +97,33 @@ class Produto(TimeStampedModel):
         return 0
 
 
+class VariacaoProduto(TimeStampedModel):
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.CASCADE,
+        related_name='variacoes',
+        verbose_name='Produto',
+    )
+    cor = models.CharField('Cor', max_length=50, blank=True)
+    tamanho = models.CharField('Tamanho', max_length=20, blank=True)
+    sku_variacao = models.CharField('SKU da Variação', max_length=80, unique=True)
+    custo = models.DecimalField('Custo (R$)', max_digits=10, decimal_places=2, default=0)
+    preco_venda = models.DecimalField('Preço de Venda (R$)', max_digits=10, decimal_places=2, default=0)
+    estoque = models.IntegerField('Estoque', default=0)
+    site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
+    ativo = models.BooleanField('Ativo', default=True)
+
+    class Meta:
+        verbose_name = 'Variação de Produto'
+        verbose_name_plural = 'Variações de Produto'
+        ordering = ['cor', 'tamanho']
+        unique_together = [('produto', 'cor', 'tamanho')]
+
+    def __str__(self):
+        partes = [p for p in [self.cor, self.tamanho] if p]
+        return f'{self.produto.nome} — {" / ".join(partes)}' if partes else self.produto.nome
+
+
 class FotoProduto(TimeStampedModel):
     produto = models.ForeignKey(
         Produto,

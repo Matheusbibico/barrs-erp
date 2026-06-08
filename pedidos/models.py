@@ -92,6 +92,14 @@ class ItemPedido(TimeStampedModel):
         related_name='itens_pedido',
         verbose_name='Produto',
     )
+    variacao = models.ForeignKey(
+        'produtos.VariacaoProduto',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='itens_pedido',
+        verbose_name='Variação',
+    )
     quantidade = models.PositiveIntegerField('Quantidade')
     preco_unitario = models.DecimalField('Preço Unitário (R$)', max_digits=10, decimal_places=2)
     custo_unitario = models.DecimalField('Custo Unitário (R$)', max_digits=10, decimal_places=2)

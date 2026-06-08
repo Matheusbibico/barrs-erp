@@ -25,6 +25,14 @@ class MovimentoEstoque(TimeStampedModel):
         related_name='movimentos',
         verbose_name='Produto',
     )
+    variacao = models.ForeignKey(
+        'produtos.VariacaoProduto',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='movimentos',
+        verbose_name='Variação',
+    )
     pedido = models.ForeignKey(
         'pedidos.Pedido',
         on_delete=models.SET_NULL,
@@ -56,8 +64,14 @@ class MovimentoEstoque(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.saldo_anterior = self.produto.estoque_total
-            self.saldo_posterior = self.saldo_anterior + self.quantidade
-            self.produto.estoque_total = self.saldo_posterior
-            self.produto.save(update_fields=['estoque_total'])
+            if self.variacao:
+                self.saldo_anterior = self.variacao.estoque
+                self.saldo_posterior = self.saldo_anterior + self.quantidade
+                self.variacao.estoque = self.saldo_posterior
+                self.variacao.save(update_fields=['estoque'])
+            else:
+                self.saldo_anterior = self.produto.estoque_total
+                self.saldo_posterior = self.saldo_anterior + self.quantidade
+                self.produto.estoque_total = self.saldo_posterior
+                self.produto.save(update_fields=['estoque_total'])
         super().save(*args, **kwargs)

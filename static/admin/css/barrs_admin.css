@@ -3,8 +3,6 @@
    Carregado via UNFOLD["STYLES"] — após o CSS base do Unfold.
    ═══════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* ── 1. Variáveis ──────────────────────────────────────────────────── */
 :root {
   /* Paleta de conteúdo (área clara) */
@@ -34,6 +32,7 @@
   --b-radius-sm:  6px;
   --b-shadow:    0 1px 4px rgba(107, 94, 83, 0.08);
   --b-shadow-md: 0 4px 16px rgba(107, 94, 83, 0.10);
+  --b-row-alt:   #FBFAF7;
 }
 
 /* ── 2. Força light mode — neutraliza dark:bg-base-900 do Alpine.js/Tailwind ──
@@ -56,6 +55,7 @@ html.light body {
 
 #page {
   background-color: var(--b-bg) !important;
+  min-height: 100vh;
 }
 
 /* ── 3. Fonte global ─────────────────────────────────────────────── */
@@ -80,6 +80,7 @@ th, td, p, a {
 /* ── 4. Fundo geral da área principal ────────────────────────────── */
 #main {
   background-color: var(--b-bg) !important;
+  min-height: 100vh;
 }
 
 /* Garante fundo bege em toda a área de conteúdo (Unfold usa várias classes) */
@@ -91,6 +92,10 @@ th, td, p, a {
 [data-mdb-theme] {
   background-color: var(--b-bg) !important;
   color: var(--b-text) !important;
+}
+
+#content {
+  padding-bottom: 28px !important;
 }
 
 /* ── 5. Sidebar — SEMPRE ESCURA ──────────────────────────────────── */
@@ -114,6 +119,10 @@ aside,
 [class*="sidebar"],
 [class*="nav-sidebar"] {
   background-color: var(--b-sb-bg) !important;
+}
+
+#nav-sidebar-inner nav {
+  background-color: transparent !important;
 }
 
 /* Header da sidebar (branding) */
@@ -162,6 +171,7 @@ aside,
 #nav-sidebar-inner a:not(.bg-primary-600):not(.barrs-table-link) {
   color: var(--b-sb-text) !important;
   transition: background 0.14s, color 0.14s;
+  border-radius: 7px !important;
 }
 
 /* Hover (não-ativo) */
@@ -173,8 +183,14 @@ aside,
 /* Item ativo */
 #nav-sidebar-inner a.active {
   background-color: var(--b-sb-active-bg) !important;
-  color: var(--b-sb-active) !important;
+  color: #F7F5EF !important;
   font-weight: 600 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+#nav-sidebar-inner a.active *,
+#nav-sidebar-inner a.active .material-symbols-outlined {
+  color: #F7F5EF !important;
 }
 
 /* Ícones Material herdam a cor do link pai */
@@ -234,6 +250,7 @@ div[class*="border-t"]:has(.cursor-pointer) {
 #main > div:first-child {
   background-color: var(--b-surface) !important;
   border-bottom-color: var(--b-border) !important;
+  box-shadow: 0 1px 0 rgba(107, 94, 83, 0.04) !important;
 }
 
 /* ── 7. KPI Grid (dashboard) ─────────────────────────────────────── */
@@ -504,7 +521,7 @@ input[type="button"],
   background: var(--b-bg) !important;
 }
 
-/* ── 13. Force light — sobrescreve dark mode do Unfold/Tailwind ──────── */
+/* ── 13. Admin Unfold — tema claro consistente ─────────────────────── */
 
 /* Anula dark mode em data-theme="dark" e classe .dark (Tailwind) */
 [data-theme="dark"],
@@ -514,90 +531,226 @@ input[type="button"],
   color-scheme: light !important;
 }
 
-/* Tabelas — fundo e texto forçados para light */
-table, thead, tbody, tr, th, td,
-.results table, .results thead, .results tbody,
-.results tr, .results th, .results td,
-#result_list, #result_list thead, #result_list tbody,
-#result_list tr, #result_list th, #result_list td {
-  background-color: #FFFFFF !important;
+/* Áreas claras do Unfold/Tailwind. Mantém a sidebar fora dessa regra. */
+#main .bg-white,
+#main .bg-base-50,
+#main .bg-base-100,
+#main .bg-base-900,
+#main .dark\:bg-base-900,
+#main .dark\:bg-base-800,
+#main .dark\:bg-base-950,
+#main .dark\:border-base-700,
+#main .dark\:text-base-300,
+#main .dark\:text-base-400 {
+  background-color: var(--b-bg) !important;
   color: var(--b-text) !important;
   border-color: var(--b-border) !important;
 }
 
-thead tr,
-#result_list thead tr {
-  background-color: var(--b-bg) !important;
+/* Cards principais da listagem, formulários, filtros e empty state. */
+#main .module,
+#main .results,
+#main .card,
+#main [class*="rounded-default"],
+#main [class*="rounded-xl"],
+#main [class*="border-base"],
+#main .changelist-form-container,
+#main #changelist-form,
+#main .change-list,
+#main .empty-changelist,
+#main .empty-form {
+  background-color: var(--b-surface) !important;
+  border-color: var(--b-border) !important;
+  color: var(--b-text) !important;
 }
 
-tbody tr:hover,
-#result_list tbody tr:hover {
-  background-color: var(--b-primary-bg) !important;
+#main .module,
+#main .results,
+#main .changelist-form-container,
+#main #changelist-form {
+  box-shadow: var(--b-shadow) !important;
 }
 
-/* Cabeçalhos de coluna */
-th,
-.column-header,
-th a,
-th a:hover,
-#result_list thead th,
-#result_list th {
-  background-color: var(--b-bg) !important;
+/* Tabelas — sem blocos brancos duros nem trechos escuros herdados. */
+#main table,
+#main thead,
+#main tbody,
+#main tr,
+#main th,
+#main td,
+#main .results table,
+#main .results thead,
+#main .results tbody,
+#main .results tr,
+#main .results th,
+#main .results td,
+#main #result_list,
+#main #result_list thead,
+#main #result_list tbody,
+#main #result_list tr,
+#main #result_list th,
+#main #result_list td {
+  color: var(--b-text) !important;
+  border-color: var(--b-border) !important;
+}
+
+#main table,
+#main .results table,
+#main #result_list {
+  background-color: var(--b-surface) !important;
+}
+
+#main thead,
+#main thead tr,
+#main #result_list thead,
+#main #result_list thead tr,
+#main .results thead,
+#main .results thead tr {
+  background-color: #F3EFE7 !important;
+}
+
+#main th,
+#main .column-header,
+#main th a,
+#main th a:hover,
+#main #result_list thead th,
+#main #result_list th {
+  background-color: #F3EFE7 !important;
   color: var(--b-muted) !important;
   border-bottom: 1px solid var(--b-border) !important;
 }
 
-/* Cards e containers internos */
-.card,
-.module,
-[class*="card-"],
-[class*="-card"],
-.changelist-form-container,
-.change-list .filtered,
-.change-list {
-  background-color: #FFFFFF !important;
-  border-color: var(--b-border) !important;
+#main tbody tr,
+#main #result_list tbody tr {
+  background-color: var(--b-surface) !important;
+}
+
+#main tbody tr:nth-child(even),
+#main #result_list tbody tr:nth-child(even) {
+  background-color: var(--b-row-alt) !important;
+}
+
+#main tbody tr:hover,
+#main #result_list tbody tr:hover {
+  background-color: var(--b-primary-bg) !important;
+}
+
+#main td:first-child,
+#main th:first-child {
+  background-color: inherit !important;
+}
+
+/* Links e textos dentro do conteúdo. */
+#main a:not(.button):not([class*="bg-primary"]) {
   color: var(--b-text) !important;
 }
 
-/* Search bar da changelist */
-#changelist-search,
-#changelist-search input,
-[class*="search"] input {
-  background-color: #FFFFFF !important;
+#main #result_list a,
+#main .results a,
+#main .field-codigo a,
+#main .field-nome a {
   color: var(--b-text) !important;
+  text-decoration-color: rgba(107, 94, 83, 0.35) !important;
+}
+
+#main #result_list a:hover,
+#main .results a:hover {
+  color: var(--b-primary) !important;
+}
+
+/* Inputs, busca e botões da barra de filtros. */
+#main input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
+#main textarea,
+#main select,
+#main #changelist-search,
+#main #changelist-search input,
+#main [class*="search"] input {
+  background-color: var(--b-surface) !important;
+  color: var(--b-text) !important;
+  border-color: var(--b-border) !important;
+  box-shadow: var(--b-shadow) !important;
+}
+
+#main input::placeholder,
+#main textarea::placeholder {
+  color: var(--b-muted) !important;
+}
+
+#main .button,
+#main a.button,
+#main input[type="submit"],
+#main input[type="button"],
+#main .submit-row input,
+#main button {
   border-color: var(--b-border) !important;
 }
 
-/* Footer / paginação */
-.paginator,
-p.paginator,
-.actions,
-[class*="paginator"],
-[class*="footer"] {
+#main .button.default,
+#main input[type="submit"].default,
+#main .submit-row input.default,
+#main [class*="bg-primary"] {
+  background-color: var(--b-primary) !important;
+  border-color: var(--b-primary) !important;
+  color: #FFFFFF !important;
+}
+
+#main .button:hover,
+#main a.button:hover,
+#main button:hover {
+  box-shadow: 0 2px 8px rgba(107, 94, 83, 0.12) !important;
+}
+
+/* Badges de status vindos do Unfold/admin. */
+#main span[style*="background"] {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.20) !important;
+}
+
+/* Rodapé / paginação alinhado ao fundo geral. */
+#main .paginator,
+#main p.paginator,
+#main .actions,
+#main [class*="paginator"],
+#main [class*="footer"] {
   background-color: var(--b-bg) !important;
   color: var(--b-muted) !important;
   border-top: 1px solid var(--b-border) !important;
 }
 
-/* Garante branco em linhas ímpares/pares — evita herdar escuro */
-#result_list tbody tr:nth-child(odd)  { background-color: #FFFFFF !important; }
-#result_list tbody tr:nth-child(even) { background-color: #FAFAF8 !important; }
-
-/* ── 14. Empty state — sem card flutuando sobre o fundo bege ────────── */
-
-.changelist-form-container:has(.empty-changelist),
-.results:empty,
-[class*="empty-changelist"],
-.empty-changelist {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+/* Empty state deve parecer parte da tela, sem bloco preto/branco perdido. */
+#main .changelist-form-container:has(.empty-changelist),
+#main .empty-changelist,
+#main .empty-form,
+#main .results:empty,
+#main [class*="empty-changelist"] {
+  background-color: var(--b-surface) !important;
+  border: 1px solid var(--b-border) !important;
+  box-shadow: var(--b-shadow) !important;
 }
 
-#changelist-form,
-.changelist-form-container {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+#main .empty-changelist .material-symbols-outlined,
+#main .empty-form .material-symbols-outlined {
+  color: var(--b-muted) !important;
+}
+
+/* Tipografia do topo, breadcrumbs e labels. */
+#main h1,
+#main h2,
+#main h3,
+#main .text-important {
+  color: var(--b-text) !important;
+}
+
+#main .text-subtle,
+#main .help,
+#main label,
+#main .breadcrumbs,
+#main .breadcrumbs a {
+  color: var(--b-muted) !important;
+}
+
+/* Regra final para manter o item ativo da sidebar legível. */
+#nav-sidebar-inner a.active,
+#nav-sidebar-inner a.active *,
+#nav-sidebar-inner a.active .material-symbols-outlined {
+  color: #F7F5EF !important;
 }

@@ -8,6 +8,14 @@
 
 {% block extrahead %}
 <script>
-(function(){try{localStorage.setItem('adminTheme','"light"');}catch(e){}})();
+(function(){
+  try {
+    localStorage.setItem('adminTheme', '"light"');
+    localStorage.setItem('theme', 'light');
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
+    document.documentElement.dataset.theme = 'light';
+  } catch (e) {}
+})();
 </script>
 {% endblock %}

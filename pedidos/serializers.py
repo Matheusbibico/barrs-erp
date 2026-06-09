@@ -68,7 +68,9 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         itens_data = validated_data.pop('itens')
         pedido = Pedido.objects.create(**validated_data)
         for item_data in itens_data:
-            ItemPedido.objects.create(pedido=pedido, **item_data)
+            item = ItemPedido(pedido=pedido, **item_data)
+            item.full_clean()
+            item.save()
         pedido.calcular_totais()
         pedido.save()
         return pedido

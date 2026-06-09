@@ -36,9 +36,26 @@
   --b-shadow-md: 0 4px 16px rgba(107, 94, 83, 0.10);
 }
 
-/* ── 2. Força light mode — evita flash escuro mesmo com OS dark ──── */
-html {
+/* ── 2. Força light mode — neutraliza dark:bg-base-900 do Alpine.js/Tailwind ──
+   O Alpine.js lê prefers-color-scheme do OS e pode colocar class="dark" em
+   <html> mesmo com THEME=light no settings.py. Sem isso, body e #main ficam
+   com fundo escuro quando o OS do usuário estiver em dark mode.            */
+html,
+html.dark,
+html.light {
   color-scheme: light !important;
+  background-color: var(--b-bg) !important;
+}
+
+body,
+html.dark body,
+html.light body {
+  background-color: var(--b-bg) !important;
+  color: var(--b-text) !important;
+}
+
+#page {
+  background-color: var(--b-bg) !important;
 }
 
 /* ── 3. Fonte global ─────────────────────────────────────────────── */

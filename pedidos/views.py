@@ -57,7 +57,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
 
 class ItemPedidoViewSet(viewsets.ModelViewSet):
-    queryset = ItemPedido.objects.select_related('pedido', 'produto')
+    queryset = ItemPedido.objects.select_related('pedido', 'produto', 'variacao')
     serializer_class = ItemPedidoSerializer
 
     def get_queryset(self):

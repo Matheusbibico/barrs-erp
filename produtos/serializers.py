@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Categoria, Fornecedor, Produto, FotoProduto
+from .models import Categoria, Fornecedor, Produto, FotoProduto, VariacaoProduto
 
 
 class CategoriaSerializer(serializers.ModelSerializer):
@@ -20,8 +20,15 @@ class FotoProdutoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class VariacaoProdutoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VariacaoProduto
+        fields = '__all__'
+
+
 class ProdutoSerializer(serializers.ModelSerializer):
     fotos = FotoProdutoSerializer(many=True, read_only=True)
+    variacoes = VariacaoProdutoSerializer(many=True, read_only=True)
     estoque_disponivel = serializers.ReadOnlyField()
     margem = serializers.ReadOnlyField()
     categoria_nome = serializers.CharField(source='categoria.nome', read_only=True)

@@ -1,10 +1,11 @@
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Categoria, Fornecedor, Produto, FotoProduto
+from .models import Categoria, Fornecedor, Produto, FotoProduto, VariacaoProduto
 from .serializers import (
     CategoriaSerializer, FornecedorSerializer,
     ProdutoSerializer, ProdutoListSerializer, FotoProdutoSerializer,
+    VariacaoProdutoSerializer,
 )
 
 
@@ -24,7 +25,7 @@ class FornecedorViewSet(viewsets.ModelViewSet):
 
 
 class ProdutoViewSet(viewsets.ModelViewSet):
-    queryset = Produto.objects.select_related('categoria', 'fornecedor').prefetch_related('fotos')
+    queryset = Produto.objects.select_related('categoria', 'fornecedor').prefetch_related('fotos', 'variacoes')
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['sku', 'nome', 'descricao']
     ordering_fields = ['nome', 'preco_venda', 'estoque_total', 'criado_em']
@@ -55,6 +56,21 @@ class ProdutoViewSet(viewsets.ModelViewSet):
 class FotoProdutoViewSet(viewsets.ModelViewSet):
     queryset = FotoProduto.objects.select_related('produto')
     serializer_class = FotoProdutoSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        produto_id = self.request.query_params.get('produto')
+        if produto_id:
+            qs = qs.filter(produto_id=produto_id)
+        return qs
+
+
+class VariacaoProdutoViewSet(viewsets.ModelViewSet):
+    queryset = VariacaoProduto.objects.select_related('produto')
+    serializer_class = VariacaoProdutoSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['sku_variacao', 'produto__nome', 'cor', 'tamanho']
+    ordering_fields = ['produto__nome', 'cor', 'tamanho']
 
     def get_queryset(self):
         qs = super().get_queryset()

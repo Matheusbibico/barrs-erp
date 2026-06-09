@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from clientes.models import Cliente
 from core.site_models import SitePedido
 from pedidos.models import ItemPedido, LucroPedido, Pagamento, Pedido
-from produtos.models import Produto
+from produtos.models import Produto, VariacaoProduto
 
 logger = logging.getLogger(__name__)
 
@@ -225,18 +225,40 @@ def _importar_pedido_unico(site_id):
         },
     )
     prod_map = {p.site_id: p for p in Produto.objects.filter(site_id__isnull=False)}
+    var_map = {v.site_id: v for v in VariacaoProduto.objects.filter(site_id__isnull=False).select_related('produto')}
 
     for si in sp.itens.all():
-        produto = prod_map.get(si.produto_id) if si.produto_id else None
+        variacao = None
+        produto = None
+
+        # Tenta encontrar por variacao_id do site (se disponível no modelo do site)
+        variacao_site_id = getattr(si, 'variacao_id', None)
+        if variacao_site_id:
+            variacao = var_map.get(variacao_site_id)
+
+        # Resolve produto a partir da variação ou do mapeamento direto
+        if variacao:
+            produto = variacao.produto
+        elif si.produto_id:
+            produto = prod_map.get(si.produto_id)
+
         produto = produto or placeholder
+
         ItemPedido.objects.create(
             pedido=ped,
             produto=produto,
+            variacao=variacao,
             quantidade=si.quantidade,
             preco_unitario=si.preco_unitario,
-            custo_unitario=Decimal('0'),
+            custo_unitario=variacao.custo if variacao else Decimal('0'),
         )
-        if produto.sku != 'SITE-DESCONHECIDO':
+
+        # Decremento de estoque: por variação se disponível, senão por produto
+        if variacao:
+            VariacaoProduto.objects.filter(pk=variacao.pk).update(
+                estoque=_F('estoque') - si.quantidade
+            )
+        elif produto.sku != 'SITE-DESCONHECIDO':
             Produto.objects.filter(pk=produto.pk).update(
                 estoque_total=_F('estoque_total') - si.quantidade
             )

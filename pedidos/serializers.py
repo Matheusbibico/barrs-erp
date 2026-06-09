@@ -6,10 +6,17 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
     subtotal = serializers.ReadOnlyField()
     produto_nome = serializers.CharField(source='produto.nome', read_only=True)
     produto_sku = serializers.CharField(source='produto.sku', read_only=True)
+    variacao_descricao = serializers.SerializerMethodField()
 
     class Meta:
         model = ItemPedido
         fields = '__all__'
+
+    def get_variacao_descricao(self, obj):
+        if obj.variacao:
+            partes = [p for p in [obj.variacao.cor, obj.variacao.tamanho] if p]
+            return ' / '.join(partes) if partes else None
+        return None
 
 
 class PagamentoSerializer(serializers.ModelSerializer):

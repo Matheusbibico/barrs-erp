@@ -754,3 +754,461 @@ input[type="button"],
 #nav-sidebar-inner a.active .material-symbols-outlined {
   color: #F7F5EF !important;
 }
+
+/* ── 14. Premium polish — Barrs ERP ─────────────────────────────────
+   Camada final para dar unidade visual ao admin: nada de branco puro
+   espalhado, nada de preto herdado do dark mode, e superfícies com
+   profundidade sutil de sistema profissional. */
+:root {
+  --b-bg: #F4F0E8;
+  --b-surface: #FFFCF6;
+  --b-surface-soft: #FAF6EE;
+  --b-surface-raised: #FFFFFF;
+  --b-border: #D8CFC0;
+  --b-border-lt: #EEE7DC;
+  --b-text: #574D43;
+  --b-muted: #8F8477;
+  --b-primary: #7F8B70;
+  --b-primary-strong: #66745B;
+  --b-primary-bg: #E9EEE2;
+  --b-gold: #B98F3E;
+  --b-danger: #B95E5E;
+  --b-row-alt: #FAF6EF;
+  --b-sb-bg: #241D19;
+  --b-sb-bg-2: #2D2520;
+  --b-sb-border: rgba(255, 255, 255, 0.08);
+  --b-sb-text: #B8AEA1;
+  --b-sb-hover: #F1E7D8;
+  --b-sb-active-bg: #89947A;
+  --b-sb-group: #817568;
+  --b-sb-brand: #E8D7B4;
+  --b-radius: 8px;
+  --b-radius-sm: 6px;
+  --b-shadow: 0 1px 2px rgba(55, 45, 37, 0.08), 0 12px 28px rgba(55, 45, 37, 0.06);
+  --b-shadow-md: 0 2px 8px rgba(55, 45, 37, 0.10), 0 18px 42px rgba(55, 45, 37, 0.10);
+}
+
+html,
+html.dark,
+html.light,
+body,
+#page,
+#main,
+#content,
+#content-main {
+  background: var(--b-bg) !important;
+  color: var(--b-text) !important;
+}
+
+#main {
+  background:
+    radial-gradient(circle at top left, rgba(255, 252, 246, 0.82), rgba(255, 252, 246, 0) 340px),
+    linear-gradient(180deg, #F8F4EC 0, var(--b-bg) 260px) !important;
+}
+
+#content {
+  padding: 18px 22px 34px !important;
+}
+
+#main > div:first-child {
+  background: rgba(255, 252, 246, 0.92) !important;
+  border-bottom: 1px solid var(--b-border) !important;
+  box-shadow: 0 1px 0 rgba(87, 77, 67, 0.05) !important;
+  backdrop-filter: blur(12px);
+}
+
+#main .breadcrumbs,
+#main .breadcrumbs a,
+#main .text-subtle,
+#main label,
+#main .help {
+  color: var(--b-muted) !important;
+}
+
+#main h1,
+#main h2,
+#main h3,
+#main .text-important {
+  color: var(--b-text) !important;
+  font-weight: 650 !important;
+}
+
+#nav-sidebar,
+#nav-sidebar-inner,
+div.bg-base-50:has(> div#nav-sidebar),
+aside,
+.sidebar,
+[class*="sidebar"],
+[class*="nav-sidebar"] {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 180px),
+    linear-gradient(180deg, var(--b-sb-bg-2), var(--b-sb-bg)) !important;
+  border-right-color: var(--b-sb-border) !important;
+}
+
+#nav-sidebar-inner > nav {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+#nav-sidebar-inner > nav > div.border-b,
+#nav-sidebar-inner .border-b:first-child,
+#nav-sidebar-inner > nav > div:last-child,
+div[class*="border-t"]:has(.cursor-pointer) {
+  border-color: var(--b-sb-border) !important;
+}
+
+#nav-sidebar-inner .text-important {
+  color: var(--b-sb-brand) !important;
+  font-weight: 650 !important;
+}
+
+#nav-sidebar-inner .text-subtle,
+#nav-sidebar-inner h2,
+#nav-sidebar-inner h2 .material-symbols-outlined,
+#nav-sidebar-inner input::placeholder {
+  color: var(--b-sb-group) !important;
+}
+
+#nav-sidebar-inner h2 {
+  letter-spacing: 0.12em !important;
+  margin-top: 4px !important;
+}
+
+#nav-sidebar-inner a:not(.bg-primary-600):not(.barrs-table-link),
+#nav-sidebar-inner .cursor-pointer {
+  color: var(--b-sb-text) !important;
+  border-radius: 8px !important;
+}
+
+#nav-sidebar-inner a:hover:not(.active):not(.bg-primary-600),
+#nav-sidebar-inner .cursor-pointer:hover {
+  background: rgba(255, 255, 255, 0.075) !important;
+  color: var(--b-sb-hover) !important;
+}
+
+#nav-sidebar-inner a.active,
+#nav-sidebar-inner a.active *,
+#nav-sidebar-inner a.active .material-symbols-outlined {
+  background-color: var(--b-sb-active-bg) !important;
+  color: #FFFCF6 !important;
+  font-weight: 650 !important;
+}
+
+#nav-sidebar-inner input[type="text"],
+#nav-sidebar-inner input[type="search"] {
+  background: rgba(255, 252, 246, 0.095) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  color: #F6EFE5 !important;
+}
+
+#nav-sidebar-inner a.bg-primary-600,
+#nav-sidebar-inner span.bg-primary-600,
+#main [class*="bg-primary"] {
+  background-color: var(--b-primary) !important;
+  color: #FFFCF6 !important;
+}
+
+#main .bg-white,
+#main .bg-base-50,
+#main .bg-base-100,
+#main .bg-base-200,
+#main .bg-base-900,
+#main .dark\:bg-base-900,
+#main .dark\:bg-base-800,
+#main .dark\:bg-base-950 {
+  background: transparent !important;
+  color: var(--b-text) !important;
+}
+
+#main .module,
+#main .results,
+#main .card,
+#main [class*="rounded-default"],
+#main [class*="rounded-xl"],
+#main .changelist-form-container,
+#main #changelist-form,
+#main .change-list,
+#main .empty-changelist,
+#main .empty-form,
+.barrs-kpi-card,
+.barrs-table-card {
+  background: linear-gradient(180deg, var(--b-surface-raised), var(--b-surface)) !important;
+  border: 1px solid var(--b-border) !important;
+  border-radius: var(--b-radius) !important;
+  box-shadow: var(--b-shadow) !important;
+  color: var(--b-text) !important;
+}
+
+#main .changelist-form-container,
+#main #changelist-form {
+  overflow: hidden !important;
+}
+
+#main table,
+#main .results table,
+#main #result_list,
+.barrs-table {
+  background: var(--b-surface) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  color: var(--b-text) !important;
+}
+
+#main thead,
+#main thead tr,
+#main #result_list thead,
+#main #result_list thead tr,
+.barrs-table thead tr {
+  background: var(--b-surface-soft) !important;
+}
+
+#main th,
+#main .column-header,
+#main th a,
+#main th a:hover,
+#main #result_list thead th,
+#main #result_list th,
+.barrs-table th {
+  background: var(--b-surface-soft) !important;
+  color: var(--b-muted) !important;
+  border-bottom: 1px solid var(--b-border) !important;
+  font-weight: 650 !important;
+}
+
+#main td,
+#main #result_list td,
+.barrs-table td {
+  border-color: var(--b-border-lt) !important;
+  color: var(--b-text) !important;
+}
+
+#main tbody tr,
+#main #result_list tbody tr,
+.barrs-table tbody tr {
+  background: var(--b-surface) !important;
+}
+
+#main tbody tr:nth-child(even),
+#main #result_list tbody tr:nth-child(even),
+.barrs-table tbody tr:nth-child(even) {
+  background: var(--b-row-alt) !important;
+}
+
+#main tbody tr:hover,
+#main #result_list tbody tr:hover,
+.barrs-table tbody tr:hover {
+  background: var(--b-primary-bg) !important;
+}
+
+#main input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
+#main textarea,
+#main select,
+#main #changelist-search,
+#main #changelist-search input,
+#main [class*="search"] input {
+  background: #FFFDF8 !important;
+  border: 1px solid var(--b-border) !important;
+  border-radius: 7px !important;
+  box-shadow: 0 1px 2px rgba(55, 45, 37, 0.06) !important;
+  color: var(--b-text) !important;
+}
+
+#main .button,
+#main a.button,
+#main input[type="submit"],
+#main input[type="button"],
+#main .submit-row input,
+#main button {
+  border-radius: 7px !important;
+  font-weight: 600 !important;
+}
+
+#main .button.default,
+#main input[type="submit"].default,
+#main .submit-row input.default {
+  background: var(--b-primary) !important;
+  border-color: var(--b-primary) !important;
+  color: #FFFCF6 !important;
+}
+
+#main .button.default:hover,
+#main input[type="submit"].default:hover,
+#main .submit-row input.default:hover,
+#main [class*="bg-primary"]:hover {
+  background: var(--b-primary-strong) !important;
+}
+
+.barrs-kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+  gap: 12px !important;
+  margin-bottom: 24px !important;
+}
+
+.barrs-kpi-card {
+  min-height: 98px;
+  padding: 18px 22px !important;
+  position: relative;
+}
+
+.barrs-kpi-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: transparent;
+}
+
+.barrs-kpi-card:hover {
+  box-shadow: var(--b-shadow-md) !important;
+}
+
+.barrs-kpi-label {
+  color: var(--b-muted) !important;
+  font-size: 10.5px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.barrs-kpi-value {
+  color: var(--b-text) !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+}
+
+.barrs-kpi-revenue::before,
+.barrs-kpi-revenue {
+  border-left-color: var(--b-primary) !important;
+}
+
+.barrs-kpi-revenue .barrs-kpi-value {
+  color: var(--b-primary-strong) !important;
+}
+
+.barrs-kpi-warn::before {
+  background: var(--b-gold);
+}
+
+.barrs-kpi-alert::before {
+  background: var(--b-danger);
+}
+
+.barrs-table-head {
+  background: linear-gradient(180deg, #FFFDF9, var(--b-surface-soft)) !important;
+  border-bottom: 1px solid var(--b-border) !important;
+  padding: 15px 20px !important;
+}
+
+.barrs-table-head h3 {
+  color: var(--b-text) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.barrs-table-link,
+#main #result_list a:hover,
+#main .results a:hover {
+  color: var(--b-primary-strong) !important;
+}
+
+.barrs-status {
+  border-radius: 6px !important;
+  font-weight: 650 !important;
+}
+
+#main .paginator,
+#main p.paginator,
+#main .actions,
+#main [class*="paginator"],
+#main [class*="footer"] {
+  background: rgba(255, 252, 246, 0.88) !important;
+  border-top: 1px solid var(--b-border) !important;
+  color: var(--b-muted) !important;
+}
+
+#main .empty-changelist,
+#main .empty-form,
+#main .results:empty,
+#main [class*="empty-changelist"] {
+  background: linear-gradient(180deg, var(--b-surface-raised), var(--b-surface)) !important;
+  border: 1px solid var(--b-border) !important;
+  box-shadow: var(--b-shadow) !important;
+}
+
+/* Busca da listagem: apenas o wrapper parece campo, o input interno fica limpo. */
+#main form:has(input[type="search"]),
+#main form:has(input[type="text"]) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#main form:has(input[type="search"]) > .bg-white,
+#main form:has(input[type="text"]) > .bg-white,
+#main div:has(> input[type="search"]),
+#main div:has(> input[type="text"]) {
+  background: #FFFDF8 !important;
+  border: 1px solid var(--b-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(55, 45, 37, 0.08) !important;
+}
+
+#main input[type="search"],
+#main form input[type="text"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#main form input[type="text"]:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
+#main form input[type="search"]:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#main form div input.grow.font-medium.min-w-0.overflow-hidden.p-2,
+#main form div input.grow.font-medium.min-w-0.overflow-hidden.p-2:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Botões primários do Unfold precisam continuar verdes depois das regras neutras. */
+#main .bg-primary-600,
+#main .bg-primary-700,
+#main .bg-primary-800,
+#main .bg-primary-900,
+#main a.bg-primary-600,
+#main button.bg-primary-600,
+#main .addlink,
+#main .empty-changelist a.bg-primary-600,
+#main .empty-form a.bg-primary-600 {
+  background: var(--b-primary) !important;
+  border-color: var(--b-primary) !important;
+  color: #FFFCF6 !important;
+}
+
+#main .bg-primary-600 *,
+#main .bg-primary-700 *,
+#main .bg-primary-800 *,
+#main .bg-primary-900 *,
+#main .addlink * {
+  color: #FFFCF6 !important;
+}
+
+#main .bg-primary-600:hover,
+#main .bg-primary-700:hover,
+#main .bg-primary-800:hover,
+#main .bg-primary-900:hover,
+#main .addlink:hover {
+  background: var(--b-primary-strong) !important;
+}
+
+#main .border.border-base-200.bg-white,
+#main .viewlink {
+  background: #FFFDF8 !important;
+  border-color: var(--b-border) !important;
+  color: var(--b-text) !important;
+}

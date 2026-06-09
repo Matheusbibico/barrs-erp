@@ -137,7 +137,9 @@ UNFOLD = {
     "STYLES": [
         lambda request: static("admin/css/barrs_admin.css"),
     ],
-    "SCRIPTS": [],
+    "SCRIPTS": [
+        lambda request: static("admin/js/barrs_force_light.js"),
+    ],
 
     # Paleta de cores da Barrs convertida para oklch
     "COLORS": {

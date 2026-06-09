@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Cliente
+from .models import Cliente, EnderecoCliente
+
+
+class EnderecoClienteInline(admin.TabularInline):
+    model = EnderecoCliente
+    extra = 0
+    fields = ('apelido', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'principal')
 
 
 @admin.register(Cliente)
@@ -12,6 +18,7 @@ class ClienteAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'whatsapp', 'email')
     list_editable = ('ativo',)
     readonly_fields = ('total_gasto', 'qtd_pedidos', 'primeira_compra', 'ultima_compra', 'criado_em', 'atualizado_em')
+    inlines = [EnderecoClienteInline]
     fieldsets = (
         ('Dados Pessoais', {'fields': ('nome', 'whatsapp', 'email', 'ativo')}),
         ('Endereço', {'fields': ('cidade', 'estado')}),

@@ -60,6 +60,18 @@ class Pedido(TimeStampedModel):
     endereco_entrega = models.TextField('Endereço de Entrega', blank=True)
     observacoes = models.TextField('Observações', blank=True)
     site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
+    endereco_estruturado = models.ForeignKey(
+        'clientes.EnderecoCliente',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pedidos',
+        verbose_name='Endereço de Entrega',
+    )
+    transportadora = models.CharField('Transportadora', max_length=100, blank=True)
+    codigo_rastreio = models.CharField('Código de Rastreio', max_length=50, blank=True, db_index=True)
+    url_rastreio = models.URLField('URL de Rastreio', blank=True)
+    previsao_entrega = models.DateField('Previsão de Entrega', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Pedido'
@@ -203,3 +215,24 @@ class LucroPedido(TimeStampedModel):
             - self.frete
             - self.embalagem
         )
+
+
+class EventoRastreio(TimeStampedModel):
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name='eventos_rastreio',
+        verbose_name='Pedido',
+    )
+    data_evento = models.DateTimeField('Data do Evento')
+    status = models.CharField('Status', max_length=100)
+    descricao = models.TextField('Descrição', blank=True)
+    local = models.CharField('Local', max_length=200, blank=True)
+
+    class Meta:
+        verbose_name = 'Evento de Rastreio'
+        verbose_name_plural = 'Eventos de Rastreio'
+        ordering = ['-data_evento']
+
+    def __str__(self):
+        return f'{self.pedido} — {self.status} ({self.data_evento:%d/%m/%Y})'

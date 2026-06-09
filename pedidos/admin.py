@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
 
 STATUS_CORES = {
     'orcamento': '#6c757d',
@@ -27,6 +27,13 @@ class PagamentoInline(admin.TabularInline):
     fields = ('metodo', 'valor', 'status', 'pago_em')
 
 
+class EventoRastreioInline(admin.TabularInline):
+    model = EventoRastreio
+    extra = 0
+    fields = ('data_evento', 'status', 'descricao', 'local')
+    ordering = ['-data_evento']
+
+
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
     list_display = (
@@ -37,12 +44,12 @@ class PedidoAdmin(admin.ModelAdmin):
     search_fields = ('cliente__nome', 'cliente__whatsapp', 'id')
     list_select_related = ('cliente', 'usuario')
     readonly_fields = ('total_bruto', 'criado_em', 'atualizado_em')
-    inlines = [ItemPedidoInline, PagamentoInline]
+    inlines = [ItemPedidoInline, PagamentoInline, EventoRastreioInline]
     date_hierarchy = 'criado_em'
     fieldsets = (
         ('Pedido', {'fields': ('cliente', 'usuario', 'canal', 'status')}),
         ('Valores', {'fields': ('total_bruto', 'desconto', 'frete', 'total_liquido')}),
-        ('Entrega', {'fields': ('endereco_entrega',)}),
+        ('Entrega', {'fields': ('endereco_entrega', 'endereco_estruturado', 'transportadora', 'codigo_rastreio', 'url_rastreio', 'previsao_entrega')}),
         ('Observações', {'fields': ('observacoes',)}),
         ('Datas', {'fields': ('criado_em', 'atualizado_em'), 'classes': ('collapse',)}),
     )

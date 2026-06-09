@@ -1,10 +1,11 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
 from .serializers import (
     PedidoSerializer, PedidoListSerializer, PedidoCreateSerializer,
     ItemPedidoSerializer, PagamentoSerializer, LucroPedidoSerializer,
+    EventoRastreioSerializer,
 )
 
 
@@ -83,3 +84,15 @@ class PagamentoViewSet(viewsets.ModelViewSet):
 class LucroPedidoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = LucroPedido.objects.select_related('pedido', 'pedido__cliente')
     serializer_class = LucroPedidoSerializer
+
+
+class EventoRastreioViewSet(viewsets.ModelViewSet):
+    queryset = EventoRastreio.objects.select_related('pedido')
+    serializer_class = EventoRastreioSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        pedido = self.request.query_params.get('pedido')
+        if pedido:
+            qs = qs.filter(pedido_id=pedido)
+        return qs

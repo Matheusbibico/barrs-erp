@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
 
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
@@ -32,10 +32,17 @@ class LucroPedidoSerializer(serializers.ModelSerializer):
         read_only_fields = ('pedido', 'receita_bruta', 'custo_produtos', 'lucro_liquido')
 
 
+class EventoRastreioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventoRastreio
+        fields = '__all__'
+
+
 class PedidoSerializer(serializers.ModelSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
     pagamentos = PagamentoSerializer(many=True, read_only=True)
     lucro = LucroPedidoSerializer(read_only=True)
+    eventos_rastreio = EventoRastreioSerializer(many=True, read_only=True)
     cliente_nome = serializers.CharField(source='cliente.nome', read_only=True)
     usuario_nome = serializers.CharField(source='usuario.get_full_name', read_only=True)
 

@@ -486,3 +486,83 @@ input[type="button"],
 .xfull div.date-hierarchy {
   background: var(--b-bg) !important;
 }
+
+/* ── 13. Force light — sobrescreve dark mode do Unfold/Tailwind ──────── */
+
+/* Anula dark mode em data-theme="dark" e classe .dark (Tailwind) */
+[data-theme="dark"],
+[data-theme="dark"] *,
+.dark,
+.dark * {
+  color-scheme: light !important;
+}
+
+/* Tabelas — fundo e texto forçados para light */
+table, thead, tbody, tr, th, td,
+.results table, .results thead, .results tbody,
+.results tr, .results th, .results td,
+#result_list, #result_list thead, #result_list tbody,
+#result_list tr, #result_list th, #result_list td {
+  background-color: #FFFFFF !important;
+  color: var(--b-text) !important;
+  border-color: var(--b-border) !important;
+}
+
+thead tr,
+#result_list thead tr {
+  background-color: var(--b-bg) !important;
+}
+
+tbody tr:hover,
+#result_list tbody tr:hover {
+  background-color: var(--b-primary-bg) !important;
+}
+
+/* Cabeçalhos de coluna */
+th,
+.column-header,
+th a,
+th a:hover,
+#result_list thead th,
+#result_list th {
+  background-color: var(--b-bg) !important;
+  color: var(--b-muted) !important;
+  border-bottom: 1px solid var(--b-border) !important;
+}
+
+/* Cards e containers internos */
+.card,
+.module,
+[class*="card-"],
+[class*="-card"],
+.changelist-form-container,
+.change-list .filtered,
+.change-list {
+  background-color: #FFFFFF !important;
+  border-color: var(--b-border) !important;
+  color: var(--b-text) !important;
+}
+
+/* Search bar da changelist */
+#changelist-search,
+#changelist-search input,
+[class*="search"] input {
+  background-color: #FFFFFF !important;
+  color: var(--b-text) !important;
+  border-color: var(--b-border) !important;
+}
+
+/* Footer / paginação */
+.paginator,
+p.paginator,
+.actions,
+[class*="paginator"],
+[class*="footer"] {
+  background-color: var(--b-bg) !important;
+  color: var(--b-muted) !important;
+  border-top: 1px solid var(--b-border) !important;
+}
+
+/* Garante branco em linhas ímpares/pares — evita herdar escuro */
+#result_list tbody tr:nth-child(odd)  { background-color: #FFFFFF !important; }
+#result_list tbody tr:nth-child(even) { background-color: #FAFAF8 !important; }

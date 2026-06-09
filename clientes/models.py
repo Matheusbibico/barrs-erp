@@ -60,7 +60,9 @@ class EnderecoCliente(TimeStampedModel):
         if self.principal:
             from django.db import transaction
             with transaction.atomic():
+                super().save(*args, **kwargs)
                 EnderecoCliente.objects.filter(
                     cliente=self.cliente, principal=True
                 ).exclude(pk=self.pk).update(principal=False)
-        super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)

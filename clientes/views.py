@@ -1,6 +1,8 @@
 import json as _json
+import logging
 import urllib.request
 
+from django.conf import settings
 from rest_framework import viewsets, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,9 +10,11 @@ from rest_framework.response import Response
 from .models import Cliente, EnderecoCliente
 from .serializers import ClienteSerializer, ClienteListSerializer, EnderecoClienteSerializer
 
+logger = logging.getLogger(__name__)
+
 
 class ClienteViewSet(viewsets.ModelViewSet):
-    queryset = Cliente.objects.all()
+    queryset = Cliente.objects.prefetch_related('enderecos')
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['nome', 'whatsapp', 'email']
     ordering_fields = ['nome', 'total_gasto', 'qtd_pedidos', 'ultima_compra']
@@ -49,8 +53,9 @@ def buscar_cep(request, cep):
     if len(cep_limpo) != 8:
         return Response({'erro': 'CEP inválido.'}, status=400)
     try:
+        timeout = getattr(settings, 'VIACEP_TIMEOUT', 5)
         url = f'https://viacep.com.br/ws/{cep_limpo}/json/'
-        with urllib.request.urlopen(url, timeout=5) as resp:
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
             dados = _json.loads(resp.read())
         if dados.get('erro'):
             return Response({'erro': 'CEP não encontrado.'}, status=404)
@@ -62,5 +67,6 @@ def buscar_cep(request, cep):
             'cidade': dados.get('localidade', ''),
             'estado': dados.get('uf', ''),
         })
-    except Exception:
+    except Exception as exc:
+        logger.warning('ViaCEP error for CEP %s: %s', cep_limpo, exc)
         return Response({'erro': 'Erro ao consultar ViaCEP.'}, status=503)

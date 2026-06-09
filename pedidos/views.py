@@ -10,7 +10,9 @@ from .serializers import (
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
-    queryset = Pedido.objects.select_related('cliente', 'usuario').prefetch_related('itens', 'itens__variacao', 'pagamentos')
+    queryset = Pedido.objects.select_related('cliente', 'usuario').prefetch_related(
+        'itens', 'itens__variacao', 'pagamentos', 'eventos_rastreio'
+    )
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['cliente__nome', 'cliente__whatsapp']
     ordering_fields = ['criado_em', 'total_liquido']

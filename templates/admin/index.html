@@ -1,0 +1,98 @@
+{% extends 'admin/base.html' %}
+{% load i18n static %}
+
+{% block title %}Dashboard | Barrs ERP{% endblock %}
+
+{% block branding %}
+  {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+
+{% if barrs_stats %}
+{# ── KPIs ── #}
+<div class="barrs-kpi-grid">
+
+  <div class="barrs-kpi-card">
+    <span class="barrs-kpi-label">Pedidos hoje</span>
+    <span class="barrs-kpi-value">{{ barrs_stats.pedidos_hoje }}</span>
+  </div>
+
+  <div class="barrs-kpi-card barrs-kpi-green">
+    <span class="barrs-kpi-label">Faturamento do mês</span>
+    <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.faturamento_mes|floatformat:2 }}</span>
+  </div>
+
+  <div class="barrs-kpi-card {% if barrs_stats.pedidos_aguardando > 0 %}barrs-kpi-warn{% endif %}">
+    <span class="barrs-kpi-label">Aguardando pagamento</span>
+    <span class="barrs-kpi-value">{{ barrs_stats.pedidos_aguardando }}</span>
+  </div>
+
+  <div class="barrs-kpi-card {% if barrs_stats.estoque_baixo > 0 %}barrs-kpi-danger{% endif %}">
+    <span class="barrs-kpi-label">Estoque crítico</span>
+    <span class="barrs-kpi-value">{{ barrs_stats.estoque_baixo }}</span>
+  </div>
+
+  <div class="barrs-kpi-card {% if barrs_stats.contas_vencidas > 0 %}barrs-kpi-danger{% endif %}">
+    <span class="barrs-kpi-label">Recebíveis vencidos</span>
+    <span class="barrs-kpi-value">{{ barrs_stats.contas_vencidas }}</span>
+  </div>
+
+  <div class="barrs-kpi-card {% if barrs_stats.contas_pagar_vencidas > 0 %}barrs-kpi-danger{% endif %}">
+    <span class="barrs-kpi-label">Contas a pagar vencidas</span>
+    <span class="barrs-kpi-value">{{ barrs_stats.contas_pagar_vencidas }}</span>
+  </div>
+
+</div>
+
+{# ── Últimos pedidos ── #}
+{% if barrs_ultimos_pedidos %}
+<div class="barrs-table-card">
+  <div class="barrs-table-head">
+    <h3>Últimos pedidos</h3>
+    <a href="{% url 'admin:pedidos_pedido_changelist' %}" class="barrs-table-link">Ver todos →</a>
+  </div>
+  <div class="barrs-table-scroll">
+    <table class="barrs-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Cliente</th>
+          <th>Canal</th>
+          <th>Status</th>
+          <th class="barrs-right">Total</th>
+          <th class="barrs-right">Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pedido in barrs_ultimos_pedidos %}
+        <tr>
+          <td>
+            <a href="{% url 'admin:pedidos_pedido_change' pedido.pk %}" class="barrs-mono">
+              #{{ pedido.id|stringformat:"s"|slice:":8"|upper }}
+            </a>
+          </td>
+          <td>{{ pedido.cliente.nome }}</td>
+          <td>{{ pedido.get_canal_display }}</td>
+          <td>{{ pedido.get_status_display }}</td>
+          <td class="barrs-right barrs-mono">R$&nbsp;{{ pedido.total_liquido|floatformat:2 }}</td>
+          <td class="barrs-right barrs-muted">{{ pedido.criado_em|date:"d/m H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endif %}{# /barrs_stats #}
+
+{# ── App list padrão do Unfold (módulos do sistema) ── #}
+<div class="flex flex-col lg:flex-row lg:gap-8 mt-6">
+  <div class="grow">
+    {% include "unfold/helpers/app_list_default.html" %}
+  </div>
+  {% include "unfold/helpers/history.html" %}
+</div>
+
+{% endblock %}

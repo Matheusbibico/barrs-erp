@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio, Devolucao, ItemDevolucao
 
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
@@ -81,3 +81,24 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         pedido.calcular_totais()
         pedido.save()
         return pedido
+
+
+class ItemDevolucaoSerializer(serializers.ModelSerializer):
+    produto_nome = serializers.CharField(source='item_pedido.produto.nome', read_only=True)
+
+    class Meta:
+        model = ItemDevolucao
+        fields = '__all__'
+
+
+class DevolucaoSerializer(serializers.ModelSerializer):
+    itens = ItemDevolucaoSerializer(many=True, read_only=True)
+    pedido_codigo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Devolucao
+        fields = '__all__'
+        read_only_fields = ('aprovada_em',)
+
+    def get_pedido_codigo(self, obj):
+        return f'#{str(obj.pedido_id)[:8].upper()}'

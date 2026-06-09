@@ -26,6 +26,8 @@ class Pedido(TimeStampedModel):
     STATUS_ENVIADO = 'enviado'
     STATUS_ENTREGUE = 'entregue'
     STATUS_CANCELADO = 'cancelado'
+    STATUS_TROCA_PENDENTE = 'troca_pendente'
+    STATUS_DEVOLVIDO = 'devolvido'
     STATUS_CHOICES = [
         (STATUS_ORCAMENTO, 'Orçamento'),
         (STATUS_RESERVADO, 'Reservado'),
@@ -34,6 +36,8 @@ class Pedido(TimeStampedModel):
         (STATUS_SEPARACAO, 'Em Separação'),
         (STATUS_ENVIADO, 'Enviado'),
         (STATUS_ENTREGUE, 'Entregue'),
+        (STATUS_TROCA_PENDENTE, 'Troca Pendente'),
+        (STATUS_DEVOLVIDO, 'Devolvido'),
         (STATUS_CANCELADO, 'Cancelado'),
     ]
 
@@ -236,3 +240,86 @@ class EventoRastreio(TimeStampedModel):
 
     def __str__(self):
         return f'{self.pedido} — {self.status} ({self.data_evento:%d/%m/%Y})'
+
+
+class Devolucao(TimeStampedModel):
+    TIPO_REEMBOLSO = 'reembolso'
+    TIPO_TROCA = 'troca'
+    TIPO_CREDITO = 'credito'
+    TIPO_CHOICES = [
+        (TIPO_REEMBOLSO, 'Reembolso'),
+        (TIPO_TROCA, 'Troca'),
+        (TIPO_CREDITO, 'Crédito em Conta'),
+    ]
+
+    STATUS_SOLICITADA = 'solicitada'
+    STATUS_APROVADA = 'aprovada'
+    STATUS_RECUSADA = 'recusada'
+    STATUS_CONCLUIDA = 'concluida'
+    STATUS_CHOICES = [
+        (STATUS_SOLICITADA, 'Solicitada'),
+        (STATUS_APROVADA, 'Aprovada'),
+        (STATUS_RECUSADA, 'Recusada'),
+        (STATUS_CONCLUIDA, 'Concluída'),
+    ]
+
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.PROTECT,
+        related_name='devolucoes',
+        verbose_name='Pedido',
+    )
+    tipo = models.CharField('Tipo', max_length=20, choices=TIPO_CHOICES)
+    motivo = models.TextField('Motivo')
+    status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default=STATUS_SOLICITADA)
+    responsavel = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Responsável',
+    )
+    observacoes = models.TextField('Observações', blank=True)
+    aprovada_em = models.DateTimeField('Aprovada em', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Devolução'
+        verbose_name_plural = 'Devoluções'
+        ordering = ['-criado_em']
+
+    def __str__(self):
+        return f'Devolução #{str(self.id)[:8].upper()} — {self.pedido}'
+
+
+class ItemDevolucao(TimeStampedModel):
+    CONDICAO_OK = 'ok'
+    CONDICAO_DEFEITO = 'defeito'
+    CONDICAO_AVARIA = 'avaria'
+    CONDICAO_CHOICES = [
+        (CONDICAO_OK, 'Em bom estado'),
+        (CONDICAO_DEFEITO, 'Com defeito'),
+        (CONDICAO_AVARIA, 'Avariado'),
+    ]
+
+    devolucao = models.ForeignKey(
+        Devolucao,
+        on_delete=models.CASCADE,
+        related_name='itens',
+        verbose_name='Devolução',
+    )
+    item_pedido = models.ForeignKey(
+        ItemPedido,
+        on_delete=models.PROTECT,
+        related_name='itens_devolucao',
+        verbose_name='Item do Pedido',
+    )
+    quantidade = models.PositiveIntegerField('Quantidade')
+    condicao = models.CharField('Condição', max_length=20, choices=CONDICAO_CHOICES, default=CONDICAO_OK)
+    observacao = models.TextField('Observação', blank=True)
+
+    class Meta:
+        verbose_name = 'Item de Devolução'
+        verbose_name_plural = 'Itens de Devolução'
+
+    def __str__(self):
+        return f'{self.quantidade}x {self.item_pedido.produto.nome} ({self.get_condicao_display()})'

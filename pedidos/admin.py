@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio, Devolucao, ItemDevolucao
 
 STATUS_CORES = {
     'orcamento': '#6c757d',
@@ -98,3 +98,58 @@ class LucroPedidoAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+class ItemDevolucaoInline(admin.TabularInline):
+    model = ItemDevolucao
+    extra = 1
+    fields = ('item_pedido', 'quantidade', 'condicao', 'observacao')
+
+
+@admin.register(Devolucao)
+class DevolucaoAdmin(admin.ModelAdmin):
+    list_display = ('codigo', 'pedido', 'tipo', 'status_badge', 'responsavel', 'criado_em')
+    list_filter = ('status', 'tipo', 'criado_em')
+    search_fields = ('pedido__cliente__nome', 'motivo')
+    list_select_related = ('pedido', 'pedido__cliente', 'responsavel')
+    readonly_fields = ('aprovada_em', 'criado_em', 'atualizado_em')
+    inlines = [ItemDevolucaoInline]
+    actions = ['aprovar_devolucoes', 'recusar_devolucoes']
+    fieldsets = (
+        ('Devolução', {'fields': ('pedido', 'tipo', 'motivo', 'status', 'responsavel')}),
+        ('Observações', {'fields': ('observacoes',)}),
+        ('Datas', {'fields': ('aprovada_em', 'criado_em', 'atualizado_em'), 'classes': ('collapse',)}),
+    )
+
+    @admin.display(description='Código')
+    def codigo(self, obj):
+        return f'#{str(obj.id)[:8].upper()}'
+
+    @admin.display(description='Status')
+    def status_badge(self, obj):
+        cores = {
+            'solicitada': '#ffc107',
+            'aprovada': '#28a745',
+            'recusada': '#dc3545',
+            'concluida': '#17a2b8',
+        }
+        cor = cores.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:4px;">{}</span>',
+            cor, obj.get_status_display(),
+        )
+
+    @admin.action(description='Aprovar devoluções selecionadas')
+    def aprovar_devolucoes(self, request, queryset):
+        count = 0
+        for devolucao in queryset.filter(status='solicitada'):
+            devolucao.status = 'aprovada'
+            devolucao.responsavel = request.user
+            devolucao.save()
+            count += 1
+        self.message_user(request, f'{count} devolução(ões) aprovada(s).')
+
+    @admin.action(description='Recusar devoluções selecionadas')
+    def recusar_devolucoes(self, request, queryset):
+        count = queryset.filter(status='solicitada').update(status='recusada')
+        self.message_user(request, f'{count} devolução(ões) recusada(s).')

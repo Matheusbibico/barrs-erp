@@ -1,11 +1,11 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio
+from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio, Devolucao, ItemDevolucao
 from .serializers import (
     PedidoSerializer, PedidoListSerializer, PedidoCreateSerializer,
     ItemPedidoSerializer, PagamentoSerializer, LucroPedidoSerializer,
-    EventoRastreioSerializer,
+    EventoRastreioSerializer, DevolucaoSerializer, ItemDevolucaoSerializer,
 )
 
 
@@ -98,3 +98,48 @@ class EventoRastreioViewSet(viewsets.ModelViewSet):
         if pedido:
             qs = qs.filter(pedido_id=pedido)
         return qs
+
+
+class DevolucaoViewSet(viewsets.ModelViewSet):
+    queryset = Devolucao.objects.select_related(
+        'pedido', 'pedido__cliente', 'responsavel'
+    ).prefetch_related('itens', 'itens__item_pedido__produto')
+    serializer_class = DevolucaoSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['pedido__cliente__nome', 'motivo']
+    ordering_fields = ['criado_em', 'status']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        status_param = self.request.query_params.get('status')
+        pedido = self.request.query_params.get('pedido')
+        if status_param:
+            qs = qs.filter(status=status_param)
+        if pedido:
+            qs = qs.filter(pedido_id=pedido)
+        return qs
+
+    @action(detail=True, methods=['post'])
+    def aprovar(self, request, pk=None):
+        devolucao = self.get_object()
+        if devolucao.status != Devolucao.STATUS_SOLICITADA:
+            return Response(
+                {'erro': 'Apenas devoluções solicitadas podem ser aprovadas.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        devolucao.status = Devolucao.STATUS_APROVADA
+        devolucao.responsavel = request.user
+        devolucao.save()
+        return Response(DevolucaoSerializer(devolucao).data)
+
+    @action(detail=True, methods=['post'])
+    def recusar(self, request, pk=None):
+        devolucao = self.get_object()
+        if devolucao.status != Devolucao.STATUS_SOLICITADA:
+            return Response(
+                {'erro': 'Apenas devoluções solicitadas podem ser recusadas.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        devolucao.status = Devolucao.STATUS_RECUSADA
+        devolucao.save()
+        return Response(DevolucaoSerializer(devolucao).data)

@@ -46,3 +46,58 @@ def atualizar_historico_cliente(sender, instance, **kwargs):
     if not cliente.primeira_compra:
         cliente.primeira_compra = instance.criado_em.date()
     cliente.save(update_fields=['total_gasto', 'qtd_pedidos', 'ultima_compra', 'primeira_compra'])
+
+
+@receiver(post_save, sender='pedidos.Devolucao')
+def processar_aprovacao_devolucao(sender, instance, **kwargs):
+    """Ao aprovar devolução: reverte estoque dos itens em bom estado e cria registro financeiro."""
+    if instance.status != 'aprovada':
+        return
+
+    from django.db import transaction
+    from django.utils import timezone as tz
+    from estoque.models import MovimentoEstoque
+    from financeiro.models import ContaReceber
+
+    with transaction.atomic():
+        # 1. Reverte estoque dos itens em bom estado
+        for item_dev in instance.itens.select_related(
+            'item_pedido__produto', 'item_pedido__variacao'
+        ).all():
+            if item_dev.condicao == 'ok':
+                MovimentoEstoque.objects.create(
+                    produto=item_dev.item_pedido.produto,
+                    variacao=item_dev.item_pedido.variacao,
+                    tipo=MovimentoEstoque.TIPO_ENTRADA,
+                    quantidade=item_dev.quantidade,
+                    motivo=f'Devolução aprovada #{str(instance.id)[:8].upper()}',
+                    usuario=instance.responsavel,
+                )
+
+        # 2. Para reembolso: cria ContaReceber com valor negativo (estorno)
+        if instance.tipo == 'reembolso':
+            valor_reembolso = sum(
+                item.item_pedido.preco_unitario * item.quantidade
+                for item in instance.itens.all()
+            )
+            if valor_reembolso > 0:
+                ContaReceber.objects.create(
+                    cliente=instance.pedido.cliente,
+                    pedido=instance.pedido,
+                    descricao=f'Estorno — Devolução #{str(instance.id)[:8].upper()}',
+                    valor=-valor_reembolso,
+                    vencimento=tz.localdate(),
+                    status='pendente',
+                    observacoes='Gerado automaticamente por aprovação de devolução tipo reembolso.',
+                )
+
+        # 3. Atualiza status do pedido
+        if instance.tipo == 'troca':
+            instance.pedido.status = 'troca_pendente'
+        else:
+            instance.pedido.status = 'devolvido'
+        instance.pedido.save(update_fields=['status', 'atualizado_em'])
+
+        # 4. Registra aprovada_em se ainda não preenchido
+        if not instance.aprovada_em:
+            sender.objects.filter(pk=instance.pk).update(aprovada_em=tz.now())

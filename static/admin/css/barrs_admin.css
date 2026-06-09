@@ -583,3 +583,21 @@ p.paginator,
 /* Garante branco em linhas ímpares/pares — evita herdar escuro */
 #result_list tbody tr:nth-child(odd)  { background-color: #FFFFFF !important; }
 #result_list tbody tr:nth-child(even) { background-color: #FAFAF8 !important; }
+
+/* ── 14. Empty state — sem card flutuando sobre o fundo bege ────────── */
+
+.changelist-form-container:has(.empty-changelist),
+.results:empty,
+[class*="empty-changelist"],
+.empty-changelist {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#changelist-form,
+.changelist-form-container {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

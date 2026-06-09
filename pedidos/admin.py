@@ -18,7 +18,7 @@ class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
     extra = 1
     fields = ('produto', 'variacao', 'quantidade', 'preco_unitario', 'custo_unitario')
-    autocomplete_fields = ['produto']
+    autocomplete_fields = ['produto', 'variacao']
 
 
 class PagamentoInline(admin.TabularInline):

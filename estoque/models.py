@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from core.models import TimeStampedModel
 
 
@@ -64,14 +64,21 @@ class MovimentoEstoque(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            if self.variacao:
-                self.saldo_anterior = self.variacao.estoque
-                self.saldo_posterior = self.saldo_anterior + self.quantidade
-                self.variacao.estoque = self.saldo_posterior
-                self.variacao.save(update_fields=['estoque'])
-            else:
-                self.saldo_anterior = self.produto.estoque_total
-                self.saldo_posterior = self.saldo_anterior + self.quantidade
-                self.produto.estoque_total = self.saldo_posterior
-                self.produto.save(update_fields=['estoque_total'])
+            from produtos.models import Produto, VariacaoProduto
+            with transaction.atomic():
+                if self.variacao_id:
+                    variacao = VariacaoProduto.objects.select_for_update().get(pk=self.variacao_id)
+                    if str(variacao.produto_id) != str(self.produto_id):
+                        from django.core.exceptions import ValidationError
+                        raise ValidationError('Variação deve pertencer ao produto informado.')
+                    self.saldo_anterior = variacao.estoque
+                    self.saldo_posterior = self.saldo_anterior + self.quantidade
+                    variacao.estoque = self.saldo_posterior
+                    variacao.save(update_fields=['estoque'])
+                else:
+                    produto = Produto.objects.select_for_update().get(pk=self.produto_id)
+                    self.saldo_anterior = produto.estoque_total
+                    self.saldo_posterior = self.saldo_anterior + self.quantidade
+                    produto.estoque_total = self.saldo_posterior
+                    produto.save(update_fields=['estoque_total'])
         super().save(*args, **kwargs)

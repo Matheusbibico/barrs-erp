@@ -60,3 +60,11 @@ class ProdutoAdmin(admin.ModelAdmin):
             cor,
             obj.get_status_display(),
         )
+
+
+@admin.register(VariacaoProduto)
+class VariacaoProdutoAdmin(admin.ModelAdmin):
+    list_display = ('produto', 'cor', 'tamanho', 'sku_variacao', 'estoque', 'ativo')
+    list_filter = ('ativo', 'cor')
+    search_fields = ('sku_variacao', 'produto__nome', 'cor', 'tamanho')
+    list_select_related = ('produto',)

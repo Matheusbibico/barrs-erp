@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.text import slugify
 from core.models import TimeStampedModel
 
@@ -145,5 +145,6 @@ class FotoProduto(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if self.principal:
-            FotoProduto.objects.filter(produto=self.produto, principal=True).update(principal=False)
+            with transaction.atomic():
+                FotoProduto.objects.filter(produto=self.produto, principal=True).update(principal=False)
         super().save(*args, **kwargs)

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from core.models import TimeStampedModel
 
@@ -110,6 +111,11 @@ class ItemPedido(TimeStampedModel):
 
     def __str__(self):
         return f'{self.quantidade}x {self.produto.nome}'
+
+    def clean(self):
+        if self.variacao_id and self.produto_id:
+            if str(self.variacao.produto_id) != str(self.produto_id):
+                raise ValidationError({'variacao': 'A variação deve pertencer ao produto selecionado.'})
 
     @property
     def subtotal(self):

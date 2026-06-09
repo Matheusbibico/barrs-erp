@@ -20,8 +20,8 @@
   --b-danger:     #C07070;   /* erro / crítico                   */
 
   /* Sidebar — sempre escura */
-  --b-sb-bg:       #1E1A18;
-  --b-sb-border:   #2D2826;
+  --b-sb-bg:       #2C2420;
+  --b-sb-border:   #3A302B;
   --b-sb-text:     #9E9488;
   --b-sb-hover:    #D9D3C7;
   --b-sb-active:   #FFFFFF;
@@ -65,6 +65,17 @@ th, td, p, a {
   background-color: var(--b-bg) !important;
 }
 
+/* Garante fundo bege em toda a área de conteúdo (Unfold usa várias classes) */
+#content,
+#content-main,
+.main,
+.content-area,
+.unfold-main-content,
+[data-mdb-theme] {
+  background-color: var(--b-bg) !important;
+  color: var(--b-text) !important;
+}
+
 /* ── 5. Sidebar — SEMPRE ESCURA ──────────────────────────────────── */
 
 /* Container fixo + inner nav */
@@ -76,6 +87,15 @@ th, td, p, a {
 
 /* Wrapper estático que envolve o nav-sidebar */
 div.bg-base-50:has(> div#nav-sidebar) {
+  background-color: var(--b-sb-bg) !important;
+}
+
+/* Seletores mais amplos para cobrir variações de markup do Unfold */
+nav[aria-label],
+aside,
+.sidebar,
+[class*="sidebar"],
+[class*="nav-sidebar"] {
   background-color: var(--b-sb-bg) !important;
 }
 
@@ -413,6 +433,29 @@ span[style*="border-radius"][style*="background"] {
 div[class*="rounded-default"],
 div[class*="rounded-xl"] {
   border-radius: var(--b-radius) !important;
+}
+
+/* Empty state — evita bloco escuro quando não há resultados */
+.results:empty,
+[class*="empty-changelist"],
+[class*="empty-results"],
+[class*="empty"] .paginator,
+.paginator:empty,
+.module.filtered,
+table.results:empty {
+  background-color: var(--b-surface) !important;
+  border-radius: var(--b-radius) !important;
+  border: 1px solid var(--b-border) !important;
+  color: var(--b-muted) !important;
+}
+
+/* Mensagem "Sem resultados" do Unfold / Django admin padrão */
+.empty-changelist,
+.empty-form,
+p.paginator,
+.paginator {
+  background-color: var(--b-surface) !important;
+  color: var(--b-muted) !important;
 }
 
 /* ── 12. Inputs e formulários ────────────────────────────────────── */

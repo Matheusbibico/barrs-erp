@@ -54,6 +54,9 @@ def processar_aprovacao_devolucao(sender, instance, **kwargs):
     if instance.status != 'aprovada':
         return
 
+    if instance.aprovada_em:
+        return  # Já processado — evita duplicação de MovimentoEstoque e ContaReceber
+
     from django.db import transaction
     from django.utils import timezone as tz
     from estoque.models import MovimentoEstoque
@@ -84,11 +87,11 @@ def processar_aprovacao_devolucao(sender, instance, **kwargs):
                 ContaReceber.objects.create(
                     cliente=instance.pedido.cliente,
                     pedido=instance.pedido,
-                    descricao=f'Estorno — Devolução #{str(instance.id)[:8].upper()}',
+                    descricao=f'[ESTORNO] Reembolso — Devolução #{str(instance.id)[:8].upper()}',
                     valor=-valor_reembolso,
                     vencimento=tz.localdate(),
-                    status='pendente',
-                    observacoes='Gerado automaticamente por aprovação de devolução tipo reembolso.',
+                    status='recebido',  # Estorno já efetivado
+                    observacoes='Estorno gerado automaticamente por aprovação de devolução tipo reembolso.',
                 )
 
         # 3. Atualiza status do pedido

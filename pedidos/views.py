@@ -1,5 +1,6 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio, Devolucao, ItemDevolucao
 from .serializers import (
@@ -101,6 +102,7 @@ class EventoRastreioViewSet(viewsets.ModelViewSet):
 
 
 class DevolucaoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Devolucao.objects.select_related(
         'pedido', 'pedido__cliente', 'responsavel'
     ).prefetch_related('itens', 'itens__item_pedido__produto')

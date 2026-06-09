@@ -141,13 +141,18 @@ class DevolucaoAdmin(admin.ModelAdmin):
 
     @admin.action(description='Aprovar devoluções selecionadas')
     def aprovar_devolucoes(self, request, queryset):
-        count = 0
-        for devolucao in queryset.filter(status='solicitada'):
-            devolucao.status = 'aprovada'
-            devolucao.responsavel = request.user
-            devolucao.save()
-            count += 1
-        self.message_user(request, f'{count} devolução(ões) aprovada(s).')
+        from django.db import transaction
+        try:
+            with transaction.atomic():
+                count = 0
+                for devolucao in queryset.filter(status='solicitada'):
+                    devolucao.status = 'aprovada'
+                    devolucao.responsavel = request.user
+                    devolucao.save()
+                    count += 1
+            self.message_user(request, f'{count} devolução(ões) aprovada(s).')
+        except Exception as exc:
+            self.message_user(request, f'Erro ao aprovar devoluções: {exc}', level='error')
 
     @admin.action(description='Recusar devoluções selecionadas')
     def recusar_devolucoes(self, request, queryset):

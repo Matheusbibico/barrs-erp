@@ -136,6 +136,7 @@ UNFOLD = {
     # CSS customizado carregado após o CSS do Unfold
     "STYLES": [
         lambda request: static("admin/css/barrs_admin.css"),
+        lambda request: static("admin/css/barrs_premium.css"),
     ],
     "SCRIPTS": [],
 
@@ -191,19 +192,19 @@ UNFOLD = {
                 "items": [
                     {
                         "title": "Pedidos",
-                        "icon": "shopping_cart",
+                        "icon": "orders",
                         "link": reverse_lazy("admin:pedidos_pedido_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
                     {
                         "title": "Devoluções",
-                        "icon": "assignment_return",
+                        "icon": "assignment_returned",
                         "link": reverse_lazy("admin:pedidos_devolucao_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
                     {
                         "title": "Produtos",
-                        "icon": "inventory_2",
+                        "icon": "inventory",
                         "link": reverse_lazy("admin:produtos_produto_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
@@ -215,7 +216,7 @@ UNFOLD = {
                     },
                     {
                         "title": "Clientes",
-                        "icon": "people",
+                        "icon": "groups",
                         "link": reverse_lazy("admin:clientes_cliente_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
@@ -234,13 +235,13 @@ UNFOLD = {
                     },
                     {
                         "title": "Contas a Receber",
-                        "icon": "payments",
+                        "icon": "account_balance_wallet",
                         "link": reverse_lazy("admin:financeiro_contareceber_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
                     {
                         "title": "Contas a Pagar",
-                        "icon": "receipt_long",
+                        "icon": "request_quote",
                         "link": reverse_lazy("admin:financeiro_contapagar_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },

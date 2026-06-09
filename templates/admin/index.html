@@ -10,40 +10,73 @@
 {% block content %}
 {% if barrs_stats %}
 
-{# ────────────────────────────── KPIs ────────────────────────────── #}
-<div class="barrs-kpi-grid">
-
-  <div class="barrs-kpi-card">
-    <span class="barrs-kpi-label">Pedidos hoje</span>
-    <span class="barrs-kpi-value">{{ barrs_stats.pedidos_hoje }}</span>
+<div class="barrs-dashboard">
+  <div class="barrs-page-hero">
+    <div>
+      <div class="barrs-page-eyebrow">Gestão interna</div>
+      <h1 class="barrs-page-title">Visão geral da Barrs Store</h1>
+      <p class="barrs-page-subtitle">
+        Acompanhe pedidos, receita, clientes e pontos de atenção da operação.
+      </p>
+    </div>
+    <div class="barrs-page-actions">
+      <a class="barrs-action" href="{% url 'admin:clientes_cliente_changelist' %}">Clientes</a>
+      <a class="barrs-action barrs-action-primary" href="{% url 'admin:pedidos_pedido_add' %}">Novo pedido</a>
+    </div>
   </div>
 
-  <div class="barrs-kpi-card barrs-kpi-revenue">
-    <span class="barrs-kpi-label">Faturamento do mês</span>
-    <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.faturamento_mes|floatformat:2 }}</span>
-  </div>
+  {# ────────────────────────────── KPIs ────────────────────────────── #}
+  <div class="barrs-kpi-grid">
 
-  <div class="barrs-kpi-card {% if barrs_stats.pedidos_aguardando > 0 %}barrs-kpi-warn{% endif %}">
-    <span class="barrs-kpi-label">Aguardando pagamento</span>
-    <span class="barrs-kpi-value">{{ barrs_stats.pedidos_aguardando }}</span>
-  </div>
+    <div class="barrs-kpi-card">
+      <span class="barrs-kpi-label">Clientes ativos</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.clientes_total }}</span>
+      <span class="barrs-kpi-meta">Base comercial atual</span>
+    </div>
 
-  <div class="barrs-kpi-card {% if barrs_stats.estoque_baixo > 0 %}barrs-kpi-alert{% endif %}">
-    <span class="barrs-kpi-label">Estoque crítico</span>
-    <span class="barrs-kpi-value">{{ barrs_stats.estoque_baixo }}</span>
-  </div>
+    <div class="barrs-kpi-card">
+      <span class="barrs-kpi-label">Pedidos do mês</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.pedidos_mes }}</span>
+      <span class="barrs-kpi-meta">{{ barrs_stats.pedidos_hoje }} pedidos hoje</span>
+    </div>
 
-  <div class="barrs-kpi-card {% if barrs_stats.contas_vencidas > 0 %}barrs-kpi-alert{% endif %}">
-    <span class="barrs-kpi-label">Recebíveis vencidos</span>
-    <span class="barrs-kpi-value">{{ barrs_stats.contas_vencidas }}</span>
-  </div>
+    <div class="barrs-kpi-card barrs-kpi-revenue">
+      <span class="barrs-kpi-label">Faturamento</span>
+      <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.faturamento_mes|floatformat:2 }}</span>
+      <span class="barrs-kpi-meta">Receita faturada no mês</span>
+    </div>
 
-  <div class="barrs-kpi-card {% if barrs_stats.contas_pagar_vencidas > 0 %}barrs-kpi-alert{% endif %}">
-    <span class="barrs-kpi-label">Contas a pagar vencidas</span>
-    <span class="barrs-kpi-value">{{ barrs_stats.contas_pagar_vencidas }}</span>
-  </div>
+    <div class="barrs-kpi-card">
+      <span class="barrs-kpi-label">Ticket médio</span>
+      <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.ticket_medio_mes|floatformat:2 }}</span>
+      <span class="barrs-kpi-meta">Média por pedido no mês</span>
+    </div>
 
-</div>
+    <div class="barrs-kpi-card {% if barrs_stats.pedidos_aguardando > 0 %}barrs-kpi-warn{% endif %}">
+      <span class="barrs-kpi-label">Aguardando pagamento</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.pedidos_aguardando }}</span>
+      <span class="barrs-kpi-meta">Pedidos que pedem acompanhamento</span>
+    </div>
+
+    <div class="barrs-kpi-card {% if barrs_stats.estoque_baixo > 0 %}barrs-kpi-alert{% endif %}">
+      <span class="barrs-kpi-label">Estoque crítico</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.estoque_baixo }}</span>
+      <span class="barrs-kpi-meta">{{ barrs_stats.produtos_ativos }} produtos ativos</span>
+    </div>
+
+    <div class="barrs-kpi-card {% if barrs_stats.contas_vencidas > 0 %}barrs-kpi-alert{% endif %}">
+      <span class="barrs-kpi-label">Recebíveis vencidos</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.contas_vencidas }}</span>
+      <span class="barrs-kpi-meta">Entradas financeiras pendentes</span>
+    </div>
+
+    <div class="barrs-kpi-card {% if barrs_stats.contas_pagar_vencidas > 0 %}barrs-kpi-alert{% endif %}">
+      <span class="barrs-kpi-label">Contas vencidas</span>
+      <span class="barrs-kpi-value">{{ barrs_stats.contas_pagar_vencidas }}</span>
+      <span class="barrs-kpi-meta">Saídas financeiras pendentes</span>
+    </div>
+
+  </div>
 
 {# ─────────────────────── Últimos pedidos ─────────────────────────── #}
 {% if barrs_ultimos_pedidos %}
@@ -90,6 +123,7 @@
 {% endif %}
 
 {# Botões de atalho rápido ── só aparecem se não há pedidos recentes #}
+</div>
 
 {% endif %}{# /barrs_stats #}
 

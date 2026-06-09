@@ -10,6 +10,7 @@ def dashboard_callback(request, context):
     # Importações aqui para evitar ciclos de importação na inicialização
     from pedidos.models import Pedido
     from produtos.models import Produto
+    from clientes.models import Cliente
     from financeiro.models import ContaReceber, ContaPagar
 
     hoje = timezone.localdate()
@@ -18,6 +19,9 @@ def dashboard_callback(request, context):
     STATUS_FATURADOS = ['pago', 'separacao', 'enviado', 'entregue']
 
     pedidos_hoje = Pedido.objects.filter(criado_em__date=hoje).count()
+    pedidos_mes = Pedido.objects.filter(criado_em__date__gte=mes_inicio).count()
+    clientes_total = Cliente.objects.filter(ativo=True).count()
+    produtos_ativos = Produto.objects.filter(status='ativo').count()
 
     faturamento_mes = (
         Pedido.objects.filter(
@@ -26,6 +30,7 @@ def dashboard_callback(request, context):
         ).aggregate(total=Sum('total_liquido'))['total']
         or 0
     )
+    ticket_medio_mes = faturamento_mes / pedidos_mes if pedidos_mes else 0
 
     pedidos_aguardando = Pedido.objects.filter(
         status='aguardando_pagamento'
@@ -55,7 +60,11 @@ def dashboard_callback(request, context):
     context.update({
         "barrs_stats": {
             "pedidos_hoje": pedidos_hoje,
+            "pedidos_mes": pedidos_mes,
             "faturamento_mes": faturamento_mes,
+            "ticket_medio_mes": ticket_medio_mes,
+            "clientes_total": clientes_total,
+            "produtos_ativos": produtos_ativos,
             "pedidos_aguardando": pedidos_aguardando,
             "estoque_baixo": estoque_baixo_count,
             "contas_vencidas": contas_vencidas,

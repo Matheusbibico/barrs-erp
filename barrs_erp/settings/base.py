@@ -128,6 +128,7 @@ UNFOLD = {
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
     "SHOW_BACK_BUTTON": True,
+    "THEME": "light",  # força tema light como padrão (persiste em localStorage)
 
     # Callback que injeta estatísticas na página inicial do admin
     "DASHBOARD_CALLBACK": "core.admin.dashboard.dashboard_callback",

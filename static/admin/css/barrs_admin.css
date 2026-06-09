@@ -1,94 +1,268 @@
-/* Barrs ERP — Custom Admin CSS
-   Fonte Inter + refinamentos visuais sobre o Unfold.
-   Carregado via UNFOLD["STYLES"] após o CSS base do Unfold.          */
+/* ═══════════════════════════════════════════════════════════════════
+   Barrs ERP — Admin CSS  (django-unfold 0.97+)
+   Carregado via UNFOLD["STYLES"] — após o CSS base do Unfold.
+   ═══════════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ── Variáveis da paleta Barrs ─────────────────────────────────────── */
+/* ── 1. Variáveis ──────────────────────────────────────────────────── */
 :root {
-  --barrs-bg:       #F5F2EC;
-  --barrs-surface:  #FFFFFF;
-  --barrs-border:   #D9D3C7;
-  --barrs-text:     #6B5E53;
-  --barrs-muted:    #9E9488;
-  --barrs-primary:  #8A947C;
-  --barrs-light:    #B7C1A8;
-  --barrs-bg-green: #E8EDE3;
-  --barrs-gold:     #C8A96A;
-  --barrs-danger:   #C07070;
-  --barrs-warn:     #C8A040;
-  --barrs-radius:   10px;
-  --barrs-shadow:   0 2px 12px rgba(107, 94, 83, 0.07);
+  /* Paleta de conteúdo (área clara) */
+  --b-bg:         #F5F2EC;   /* fundo geral — bege quente        */
+  --b-surface:    #FFFFFF;   /* cards, modais, forms             */
+  --b-border:     #D9D3C7;   /* bordas padrão                    */
+  --b-border-lt:  #EDE9E3;   /* bordas ultra-sutis               */
+  --b-text:       #6B5E53;   /* texto principal                  */
+  --b-muted:      #9E9488;   /* texto secundário / labels        */
+  --b-primary:    #8A947C;   /* verde primário Barrs             */
+  --b-primary-bg: #E8EDE3;   /* fundo verde suave                */
+  --b-gold:       #C8A96A;   /* destaque / alertas leves         */
+  --b-danger:     #C07070;   /* erro / crítico                   */
+
+  /* Sidebar — sempre escura */
+  --b-sb-bg:       #1E1A18;
+  --b-sb-border:   #2D2826;
+  --b-sb-text:     #9E9488;
+  --b-sb-hover:    #D9D3C7;
+  --b-sb-active:   #FFFFFF;
+  --b-sb-active-bg: #8A947C;
+  --b-sb-group:    #6B5E53;
+  --b-sb-brand:    #C8A96A;   /* título "Barrs ERP" na sidebar   */
+
+  /* Tokens de forma */
+  --b-radius:    10px;
+  --b-radius-sm:  6px;
+  --b-shadow:    0 1px 4px rgba(107, 94, 83, 0.08);
+  --b-shadow-md: 0 4px 16px rgba(107, 94, 83, 0.10);
 }
 
-/* ── Fonte global ────────────────────────────────────────────────────── */
+/* ── 2. Força light mode — evita flash escuro mesmo com OS dark ──── */
+html {
+  color-scheme: light !important;
+}
+
+/* ── 3. Fonte global ─────────────────────────────────────────────── */
 body,
-#nav-sidebar,
-.main-content,
+input, select, textarea, button, label,
 h1, h2, h3, h4, h5, h6,
-.sidebar,
-th, td, label, input, select, textarea, button {
+th, td, p, a, span {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── KPI Grid (dashboard) ────────────────────────────────────────────── */
+/* ── 4. Fundo geral da área principal ────────────────────────────── */
+#main {
+  background-color: var(--b-bg) !important;
+}
+
+/* ── 5. Sidebar — SEMPRE ESCURA ──────────────────────────────────── */
+
+/* Container fixo + inner nav */
+#nav-sidebar,
+#nav-sidebar-inner {
+  background-color: var(--b-sb-bg) !important;
+  border-right-color: var(--b-sb-border) !important;
+}
+
+/* Wrapper estático que envolve o nav-sidebar */
+div.bg-base-50:has(> div#nav-sidebar) {
+  background-color: var(--b-sb-bg) !important;
+}
+
+/* Header da sidebar (branding) */
+#nav-sidebar-inner > nav > div.border-b,
+#nav-sidebar-inner .border-b:first-child {
+  border-bottom-color: var(--b-sb-border) !important;
+}
+
+/* Título "Barrs ERP" */
+#nav-sidebar-inner .text-important {
+  color: var(--b-sb-brand) !important;
+}
+
+/* Subtítulo "Gestão interna" */
+#nav-sidebar-inner .text-subtle {
+  color: var(--b-sb-group) !important;
+}
+
+/* Quadrado verde com ícone */
+#nav-sidebar-inner a.bg-primary-600,
+#nav-sidebar-inner span.bg-primary-600 {
+  background-color: var(--b-primary) !important;
+}
+
+/* Separadores de grupo */
+#nav-sidebar-inner hr {
+  border-color: var(--b-sb-border) !important;
+}
+
+/* Títulos dos grupos: LOJA / OPERAÇÕES / SISTEMA */
+#nav-sidebar-inner h2 {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.10em !important;
+  color: var(--b-sb-group) !important;
+  padding-top: 12px !important;
+}
+
+/* Chevron collapsible dos grupos */
+#nav-sidebar-inner h2 .material-symbols-outlined {
+  color: var(--b-sb-group) !important;
+}
+
+/* Links de navegação — estado normal */
+#nav-sidebar-inner a:not(.bg-primary-600):not(.barrs-table-link) {
+  color: var(--b-sb-text) !important;
+  transition: background 0.14s, color 0.14s;
+}
+
+/* Hover (não-ativo) */
+#nav-sidebar-inner a:hover:not(.active):not(.bg-primary-600) {
+  color: var(--b-sb-hover) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Item ativo */
+#nav-sidebar-inner a.active {
+  background-color: var(--b-sb-active-bg) !important;
+  color: var(--b-sb-active) !important;
+  font-weight: 600 !important;
+}
+
+/* Ícones Material herdam a cor do link pai */
+#nav-sidebar-inner a .material-symbols-outlined {
+  color: inherit !important;
+}
+
+/* Barra de busca dentro da sidebar */
+#nav-sidebar-inner input[type="text"],
+#nav-sidebar-inner input[type="search"] {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: var(--b-sb-border) !important;
+  color: var(--b-sb-hover) !important;
+  border-radius: var(--b-radius-sm) !important;
+}
+
+#nav-sidebar-inner input::placeholder {
+  color: var(--b-sb-group) !important;
+  opacity: 1;
+}
+
+/* Rodapé de usuário */
+#nav-sidebar-inner > nav > div:last-child,
+div[class*="border-t"]:has(.cursor-pointer) {
+  border-top-color: var(--b-sb-border) !important;
+}
+
+#nav-sidebar-inner .cursor-pointer {
+  color: var(--b-sb-text) !important;
+}
+
+#nav-sidebar-inner .cursor-pointer:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: var(--b-sb-hover) !important;
+}
+
+/* Popup de conta (theme switch, logout) */
+#nav-sidebar-inner nav.absolute,
+#nav-sidebar-inner nav.bg-white {
+  background-color: #2D2826 !important;
+  border-color: var(--b-sb-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+#nav-sidebar-inner nav.absolute a,
+#nav-sidebar-inner nav.absolute button,
+#nav-sidebar-inner nav.absolute span {
+  color: var(--b-sb-text) !important;
+}
+
+#nav-sidebar-inner nav.absolute a:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--b-sb-hover) !important;
+}
+
+/* ── 6. Header / Topbar ──────────────────────────────────────────── */
+#main > div:first-child {
+  background-color: var(--b-surface) !important;
+  border-bottom-color: var(--b-border) !important;
+}
+
+/* ── 7. KPI Grid (dashboard) ─────────────────────────────────────── */
 .barrs-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  gap: 14px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .barrs-kpi-card {
-  background: var(--barrs-surface);
-  border: 1px solid var(--barrs-border);
-  border-radius: var(--barrs-radius);
+  background: var(--b-surface);
+  border: 1px solid var(--b-border);
+  border-radius: 12px;
   padding: 20px 22px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: var(--b-shadow);
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .barrs-kpi-card:hover {
-  box-shadow: var(--barrs-shadow);
+  box-shadow: var(--b-shadow-md);
   transform: translateY(-1px);
 }
 
 .barrs-kpi-label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.065em;
-  color: var(--barrs-muted);
+  letter-spacing: 0.08em;
+  color: var(--b-muted);
+  line-height: 1;
 }
 
 .barrs-kpi-value {
   font-size: 28px;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--barrs-text);
+  letter-spacing: -0.025em;
+  color: var(--b-text);
   line-height: 1;
 }
 
-/* Variantes de cor para os cards */
-.barrs-kpi-green .barrs-kpi-value { color: var(--barrs-primary); }
-.barrs-kpi-warn  .barrs-kpi-value { color: var(--barrs-gold);    }
-.barrs-kpi-danger .barrs-kpi-value { color: var(--barrs-danger); }
+/* Faturamento — borda e valor verdes */
+.barrs-kpi-revenue {
+  border-left: 3px solid var(--b-primary);
+}
+.barrs-kpi-revenue .barrs-kpi-value {
+  color: var(--b-primary);
+}
 
-/* Borda sutil de alerta */
-.barrs-kpi-warn  { border-left: 3px solid var(--barrs-gold);   }
-.barrs-kpi-danger { border-left: 3px solid var(--barrs-danger); }
+/* Alertas leves — gold */
+.barrs-kpi-warn {
+  border-left: 3px solid var(--b-gold);
+}
+.barrs-kpi-warn .barrs-kpi-value {
+  color: var(--b-gold);
+}
 
-/* ── Tabela de últimos pedidos ───────────────────────────────────────── */
+/* Alertas críticos — danger */
+.barrs-kpi-alert {
+  border-left: 3px solid var(--b-danger);
+}
+.barrs-kpi-alert .barrs-kpi-value {
+  color: var(--b-danger);
+}
+
+/* ── 8. Tabela de últimos pedidos ────────────────────────────────── */
 .barrs-table-card {
-  background: var(--barrs-surface);
-  border: 1px solid var(--barrs-border);
-  border-radius: var(--barrs-radius);
+  background: var(--b-surface);
+  border: 1px solid var(--b-border);
+  border-radius: var(--b-radius);
   overflow: hidden;
   margin-bottom: 24px;
-  box-shadow: var(--barrs-shadow);
+  box-shadow: var(--b-shadow);
 }
 
 .barrs-table-head {
@@ -96,26 +270,30 @@ th, td, label, input, select, textarea, button {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--barrs-border);
+  border-bottom: 1px solid var(--b-border);
 }
 
 .barrs-table-head h3 {
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--barrs-text);
+  color: var(--b-text);
 }
 
 .barrs-table-link {
   font-size: 12px;
-  color: var(--barrs-primary);
-  text-decoration: none;
   font-weight: 500;
+  color: var(--b-primary);
+  text-decoration: none;
 }
 
-.barrs-table-link:hover { text-decoration: underline; }
+.barrs-table-link:hover {
+  text-decoration: underline;
+}
 
-.barrs-table-scroll { overflow-x: auto; }
+.barrs-table-scroll {
+  overflow-x: auto;
+}
 
 .barrs-table {
   width: 100%;
@@ -123,108 +301,135 @@ th, td, label, input, select, textarea, button {
   font-size: 13px;
 }
 
+/* Header */
 .barrs-table thead tr {
-  background: var(--barrs-bg);
+  background: var(--b-bg);
 }
 
 .barrs-table th {
   padding: 9px 16px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.055em;
-  color: var(--barrs-muted);
+  letter-spacing: 0.07em;
+  color: var(--b-muted);
   text-align: left;
   white-space: nowrap;
+  border-bottom: 1px solid var(--b-border);
 }
+
+/* Linhas alternadas */
+.barrs-table tbody tr:nth-child(odd)  { background-color: #FFFFFF; }
+.barrs-table tbody tr:nth-child(even) { background-color: #FAFAF8; }
+.barrs-table tbody tr:hover           { background-color: #E8EDE3 !important; }
 
 .barrs-table td {
   padding: 11px 16px;
-  color: var(--barrs-text);
-  border-top: 1px solid #F0EDE8;
+  color: var(--b-text);
+  border-top: 1px solid var(--b-border-lt);
   white-space: nowrap;
 }
 
-.barrs-table tbody tr:hover { background: var(--barrs-bg); }
-
 .barrs-table a {
-  color: var(--barrs-primary);
+  color: var(--b-primary);
   text-decoration: none;
   font-weight: 500;
 }
 
-.barrs-table a:hover { text-decoration: underline; }
-
-/* Utilitários usados na tabela */
-.barrs-right  { text-align: right !important; }
-.barrs-mono   { font-family: 'JetBrains Mono', 'Fira Code', monospace !important; font-size: 12px; }
-.barrs-muted  { color: var(--barrs-muted) !important; }
-
-/* ── Refinamentos gerais na interface Unfold ─────────────────────────── */
-
-/* Border-radius mais suave nos cards de lista */
-.module,
-.card,
-[class*="rounded-"] {
-  border-radius: var(--barrs-radius) !important;
+.barrs-table a:hover {
+  text-decoration: underline;
 }
 
-/* Sombra sutil nas caixas de conteúdo */
-.module {
-  box-shadow: var(--barrs-shadow);
-}
-
-/* Cabeçalho de coluna nas listas */
-#result_list th,
-#result_list thead th {
+/* ── 9. Status badges semânticos ─────────────────────────────────── */
+.barrs-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 5px;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  /* default neutro */
+  background: #F5F2EC;
+  color: var(--b-text);
 }
 
-/* Badges de status — arredondamento e peso */
-span[style*="border-radius"] {
-  font-family: 'Inter', sans-serif !important;
+.barrs-status-entregue            { background: #E8EDE3; color: #4A6640; }
+.barrs-status-pago                { background: #E8EDE3; color: #4A6640; }
+.barrs-status-enviado             { background: #EFF6FF; color: #1D4ED8; }
+.barrs-status-separacao           { background: #EFF6FF; color: #2563EB; }
+.barrs-status-aguardando_pagamento { background: #FEF3E2; color: #92600A; }
+.barrs-status-reservado           { background: #F0F4FF; color: #3730A3; }
+.barrs-status-orcamento           { background: #F5F2EC; color: #6B5E53; }
+.barrs-status-cancelado           { background: #FEE2E2; color: #991B1B; }
+.barrs-status-devolvido           { background: #F5F0FF; color: #7C3AED; }
+.barrs-status-troca_pendente      { background: #FFF4F0; color: #C2410C; }
+
+/* ── 10. Utilitários ─────────────────────────────────────────────── */
+.barrs-right { text-align: right !important; }
+.barrs-muted { color: var(--b-muted) !important; }
+.barrs-mono  {
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+
+/* ── 11. Refinamentos nas listas do admin ────────────────────────── */
+
+/* Cabeçalho de coluna */
+#result_list thead th,
+#result_list th {
   font-size: 11px !important;
   font-weight: 500 !important;
-  letter-spacing: 0.03em;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
 }
 
-/* Botões principais com cor Barrs */
-.button,
-input[type="submit"],
-input[type="button"] {
-  border-radius: 7px !important;
+/* Badges inline gerados via format_html nos admin.py */
+span[style*="border-radius"][style*="background"] {
+  font-size: 11px !important;
   font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
 }
 
-/* Inputs e selects */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="url"],
-input[type="date"],
+/* Sombra sutil nos módulos (cards de conteúdo) */
+.module {
+  box-shadow: var(--b-shadow) !important;
+}
+
+/* Border-radius consistente */
+.module,
+.results,
+div[class*="rounded-default"],
+div[class*="rounded-xl"] {
+  border-radius: var(--b-radius) !important;
+}
+
+/* ── 12. Inputs e formulários ────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
 textarea,
 select {
-  border-radius: 7px !important;
+  border-radius: var(--b-radius-sm) !important;
   font-size: 13px !important;
 }
 
-/* Breadcrumb mais limpo */
-.breadcrumbs {
-  font-size: 12px !important;
-  padding: 8px 20px !important;
+/* Botões */
+.button, a.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input {
+  border-radius: var(--b-radius-sm) !important;
+  font-weight: 500 !important;
 }
 
-/* ── Dark mode — ajustes da paleta Barrs ─────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --barrs-surface:  #1E1A18;
-    --barrs-border:   #352E2A;
-    --barrs-text:     #D9D3C7;
-    --barrs-muted:    #7D7468;
-    --barrs-bg:       #161311;
-  }
+/* Breadcrumb */
+.breadcrumbs {
+  font-size: 12px !important;
+  background-color: transparent !important;
+}
+
+/* Date hierarchy */
+.xfull .date-hierarchy,
+.xfull div.date-hierarchy {
+  background: var(--b-bg) !important;
 }

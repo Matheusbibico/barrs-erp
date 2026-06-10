@@ -9,127 +9,159 @@
 
 {% block content %}
 {% if barrs_stats %}
+<div class="bd">
 
-<div class="barrs-dashboard">
-  <div class="barrs-page-hero">
-    <div>
-      <div class="barrs-page-eyebrow">Gestão interna</div>
-      <h1 class="barrs-page-title">Visão geral da Barrs Store</h1>
-      <p class="barrs-page-subtitle">
-        Acompanhe pedidos, receita, clientes e pontos de atenção da operação.
-      </p>
+  {# ── Header ────────────────────────────────────────────────────── #}
+  <header class="bd-header">
+    <div class="bd-header-info">
+      <p class="bd-eyebrow">{% now "d \d\e N \d\e Y" %}</p>
+      <h1 class="bd-title">Visão Geral</h1>
     </div>
-    <div class="barrs-page-actions">
-      <a class="barrs-action" href="{% url 'admin:clientes_cliente_changelist' %}">Clientes</a>
-      <a class="barrs-action barrs-action-primary" href="{% url 'admin:pedidos_pedido_add' %}">Novo pedido</a>
-    </div>
-  </div>
+    <nav class="bd-actions">
+      <a class="bd-btn" href="{% url 'admin:pedidos_pedido_changelist' %}">
+        <span class="material-symbols-outlined">orders</span>Pedidos
+      </a>
+      <a class="bd-btn bd-btn--primary" href="{% url 'admin:pedidos_pedido_add' %}">
+        <span class="material-symbols-outlined">add</span>Novo pedido
+      </a>
+    </nav>
+  </header>
 
-  {# ────────────────────────────── KPIs ────────────────────────────── #}
-  <div class="barrs-kpi-grid">
+  {# ── KPIs — Métricas principais ─────────────────────────────────── #}
+  <div class="bd-kpis">
 
-    <div class="barrs-kpi-card">
-      <span class="barrs-kpi-label">Clientes ativos</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.clientes_total }}</span>
-      <span class="barrs-kpi-meta">Base comercial atual</span>
-    </div>
-
-    <div class="barrs-kpi-card">
-      <span class="barrs-kpi-label">Pedidos do mês</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.pedidos_mes }}</span>
-      <span class="barrs-kpi-meta">{{ barrs_stats.pedidos_hoje }} pedidos hoje</span>
-    </div>
-
-    <div class="barrs-kpi-card barrs-kpi-revenue">
-      <span class="barrs-kpi-label">Faturamento</span>
-      <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.faturamento_mes|floatformat:2 }}</span>
-      <span class="barrs-kpi-meta">Receita faturada no mês</span>
+    <div class="bd-kpi bd-kpi--revenue">
+      <div class="bd-kpi-top">
+        <span class="bd-kpi-label">Faturamento do mês</span>
+        <span class="bd-kpi-icon material-symbols-outlined">payments</span>
+      </div>
+      <span class="bd-kpi-value">R$&nbsp;{{ barrs_stats.faturamento_mes|floatformat:0 }}</span>
+      <span class="bd-kpi-meta">Receita faturada no período</span>
     </div>
 
-    <div class="barrs-kpi-card">
-      <span class="barrs-kpi-label">Ticket médio</span>
-      <span class="barrs-kpi-value">R$&nbsp;{{ barrs_stats.ticket_medio_mes|floatformat:2 }}</span>
-      <span class="barrs-kpi-meta">Média por pedido no mês</span>
+    <div class="bd-kpi">
+      <div class="bd-kpi-top">
+        <span class="bd-kpi-label">Pedidos no mês</span>
+        <span class="bd-kpi-icon material-symbols-outlined">shopping_bag</span>
+      </div>
+      <span class="bd-kpi-value">{{ barrs_stats.pedidos_mes }}</span>
+      <span class="bd-kpi-meta">{{ barrs_stats.pedidos_hoje }} novos hoje</span>
     </div>
 
-    <div class="barrs-kpi-card {% if barrs_stats.pedidos_aguardando > 0 %}barrs-kpi-warn{% endif %}">
-      <span class="barrs-kpi-label">Aguardando pagamento</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.pedidos_aguardando }}</span>
-      <span class="barrs-kpi-meta">Pedidos que pedem acompanhamento</span>
+    <div class="bd-kpi">
+      <div class="bd-kpi-top">
+        <span class="bd-kpi-label">Ticket médio</span>
+        <span class="bd-kpi-icon material-symbols-outlined">receipt_long</span>
+      </div>
+      <span class="bd-kpi-value">R$&nbsp;{{ barrs_stats.ticket_medio_mes|floatformat:0 }}</span>
+      <span class="bd-kpi-meta">Por pedido faturado</span>
     </div>
 
-    <div class="barrs-kpi-card {% if barrs_stats.estoque_baixo > 0 %}barrs-kpi-alert{% endif %}">
-      <span class="barrs-kpi-label">Estoque crítico</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.estoque_baixo }}</span>
-      <span class="barrs-kpi-meta">{{ barrs_stats.produtos_ativos }} produtos ativos</span>
-    </div>
-
-    <div class="barrs-kpi-card {% if barrs_stats.contas_vencidas > 0 %}barrs-kpi-alert{% endif %}">
-      <span class="barrs-kpi-label">Recebíveis vencidos</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.contas_vencidas }}</span>
-      <span class="barrs-kpi-meta">Entradas financeiras pendentes</span>
-    </div>
-
-    <div class="barrs-kpi-card {% if barrs_stats.contas_pagar_vencidas > 0 %}barrs-kpi-alert{% endif %}">
-      <span class="barrs-kpi-label">Contas vencidas</span>
-      <span class="barrs-kpi-value">{{ barrs_stats.contas_pagar_vencidas }}</span>
-      <span class="barrs-kpi-meta">Saídas financeiras pendentes</span>
+    <div class="bd-kpi">
+      <div class="bd-kpi-top">
+        <span class="bd-kpi-label">Clientes ativos</span>
+        <span class="bd-kpi-icon material-symbols-outlined">groups</span>
+      </div>
+      <span class="bd-kpi-value">{{ barrs_stats.clientes_total }}</span>
+      <span class="bd-kpi-meta">{{ barrs_stats.produtos_ativos }} produtos no catálogo</span>
     </div>
 
   </div>
 
-{# ─────────────────────── Últimos pedidos ─────────────────────────── #}
-{% if barrs_ultimos_pedidos %}
-<div class="barrs-table-card">
-  <div class="barrs-table-head">
-    <h3>Últimos pedidos</h3>
-    <a href="{% url 'admin:pedidos_pedido_changelist' %}" class="barrs-table-link">Ver todos →</a>
+  {# ── Alertas operacionais ────────────────────────────────────────── #}
+  <div class="bd-alerts">
+
+    <a class="bd-alert {% if barrs_stats.pedidos_aguardando > 0 %}bd-alert--warn{% endif %}"
+       href="{% url 'admin:pedidos_pedido_changelist' %}?status__exact=aguardando_pagamento">
+      <span class="bd-alert-icon material-symbols-outlined">pending_actions</span>
+      <div class="bd-alert-body">
+        <span class="bd-alert-num">{{ barrs_stats.pedidos_aguardando }}</span>
+        <span class="bd-alert-lbl">Aguardando pagamento</span>
+      </div>
+      <span class="bd-alert-arrow material-symbols-outlined">chevron_right</span>
+    </a>
+
+    <a class="bd-alert {% if barrs_stats.estoque_baixo > 0 %}bd-alert--danger{% endif %}"
+       href="{% url 'admin:produtos_produto_changelist' %}">
+      <span class="bd-alert-icon material-symbols-outlined">inventory_2</span>
+      <div class="bd-alert-body">
+        <span class="bd-alert-num">{{ barrs_stats.estoque_baixo }}</span>
+        <span class="bd-alert-lbl">Produtos em estoque crítico</span>
+      </div>
+      <span class="bd-alert-arrow material-symbols-outlined">chevron_right</span>
+    </a>
+
+    <a class="bd-alert {% if barrs_stats.contas_vencidas > 0 %}bd-alert--danger{% endif %}"
+       href="{% url 'admin:financeiro_contareceber_changelist' %}">
+      <span class="bd-alert-icon material-symbols-outlined">account_balance_wallet</span>
+      <div class="bd-alert-body">
+        <span class="bd-alert-num">{{ barrs_stats.contas_vencidas }}</span>
+        <span class="bd-alert-lbl">Recebíveis vencidos</span>
+      </div>
+      <span class="bd-alert-arrow material-symbols-outlined">chevron_right</span>
+    </a>
+
+    <a class="bd-alert {% if barrs_stats.contas_pagar_vencidas > 0 %}bd-alert--danger{% endif %}"
+       href="{% url 'admin:financeiro_contapagar_changelist' %}">
+      <span class="bd-alert-icon material-symbols-outlined">request_quote</span>
+      <div class="bd-alert-body">
+        <span class="bd-alert-num">{{ barrs_stats.contas_pagar_vencidas }}</span>
+        <span class="bd-alert-lbl">Contas vencidas a pagar</span>
+      </div>
+      <span class="bd-alert-arrow material-symbols-outlined">chevron_right</span>
+    </a>
+
   </div>
-  <div class="barrs-table-scroll">
-    <table class="barrs-table">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Cliente</th>
-          <th>Canal</th>
-          <th>Status</th>
-          <th class="barrs-right">Total</th>
-          <th class="barrs-right">Data</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for pedido in barrs_ultimos_pedidos %}
-        <tr>
-          <td>
-            <a href="{% url 'admin:pedidos_pedido_change' pedido.pk %}" class="barrs-mono">
-              #{{ pedido.id|stringformat:"s"|slice:":8"|upper }}
-            </a>
-          </td>
-          <td>{{ pedido.cliente.nome }}</td>
-          <td class="barrs-muted">{{ pedido.get_canal_display }}</td>
-          <td>
-            <span class="barrs-status barrs-status-{{ pedido.status }}">
-              {{ pedido.get_status_display }}
-            </span>
-          </td>
-          <td class="barrs-right barrs-mono">R$&nbsp;{{ pedido.total_liquido|floatformat:2 }}</td>
-          <td class="barrs-right barrs-muted">{{ pedido.criado_em|date:"d/m H:i" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+  {# ── Últimos pedidos ─────────────────────────────────────────────── #}
+  {% if barrs_ultimos_pedidos %}
+  <div class="bd-table-card">
+    <div class="bd-table-head">
+      <div class="bd-table-head-l">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <h3>Últimos pedidos</h3>
+      </div>
+      <a href="{% url 'admin:pedidos_pedido_changelist' %}" class="bd-table-link">
+        Ver todos<span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+    <div class="bd-table-wrap">
+      <table class="bd-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Canal</th>
+            <th>Status</th>
+            <th class="bd-r">Total</th>
+            <th class="bd-r">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in barrs_ultimos_pedidos %}
+          <tr>
+            <td>
+              <a href="{% url 'admin:pedidos_pedido_change' pedido.pk %}" class="bd-order-id">
+                #{{ pedido.id|stringformat:"s"|slice:":8"|upper }}
+              </a>
+            </td>
+            <td class="bd-cell-strong">{{ pedido.cliente.nome }}</td>
+            <td class="bd-muted">{{ pedido.get_canal_display }}</td>
+            <td>
+              <span class="bd-badge bd-badge--{{ pedido.status }}">
+                {{ pedido.get_status_display }}
+              </span>
+            </td>
+            <td class="bd-r bd-mono">R$&nbsp;{{ pedido.total_liquido|floatformat:2 }}</td>
+            <td class="bd-r bd-muted">{{ pedido.criado_em|date:"d/m H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
+  {% endif %}
+
 </div>
-{% endif %}
-
-{# Botões de atalho rápido ── só aparecem se não há pedidos recentes #}
-</div>
-
 {% endif %}{# /barrs_stats #}
-
-{# ── Histórico recente (barra lateral direita do Unfold) ── #}
-<div class="mt-4">
-  {% include "unfold/helpers/history.html" %}
-</div>
-
 {% endblock %}

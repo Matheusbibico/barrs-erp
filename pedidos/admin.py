@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.contrib import admin
 from django.db import transaction
+from django.utils import timezone
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 
@@ -7,6 +10,24 @@ from .models import (
     Devolucao, ItemDevolucao,
     ItemPedido, Pagamento, Pedido,
 )
+
+
+class AtrasadosFilter(admin.SimpleListFilter):
+    title = 'Envio em atraso'
+    parameter_name = 'atrasados'
+
+    def lookups(self, request, model_admin):
+        return [('1', 'Pagos há +3 dias sem rastreio')]
+
+    def queryset(self, request, queryset):
+        if self.value() == '1':
+            limite = timezone.now() - timedelta(days=3)
+            return queryset.filter(
+                status=Pedido.STATUS_PAGO,
+                codigo_rastreio='',
+                criado_em__lte=limite,
+            )
+        return queryset
 
 # Cores Barrs para cada status de pedido
 _STATUS_PEDIDO_COR = {
@@ -52,7 +73,7 @@ class PedidoAdmin(ModelAdmin):
         'codigo', 'cliente', 'status_badge',
         'total_liquido', 'canal', 'criado_em',
     )
-    list_filter = ('status', 'canal', 'criado_em')
+    list_filter = ('status', 'canal', 'criado_em', AtrasadosFilter)
     ordering = ['-id']
     search_fields = ('=id', 'cliente__nome', 'cliente__whatsapp')
     list_select_related = ('cliente',)

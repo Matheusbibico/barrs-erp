@@ -26,6 +26,16 @@
 .mini-kpi .val{font-size:1.4rem;font-weight:700}
 .mini-kpi .lbl{font-size:.75rem;color:var(--body-quiet-color,#888);margin-top:.2rem}
 .mini-kpi.alerta .val{color:#e74c3c}
+.meta-bar-wrap{background:#e9ecef;border-radius:4px;height:12px;margin:.5rem 0}
+.meta-bar{background:#1cc88a;height:12px;border-radius:4px;transition:width .4s}
+.atalhos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.atalho-btn{display:block;padding:.9rem .75rem;border-radius:6px;text-decoration:none;text-align:center;font-weight:600;font-size:.85rem;border:1px solid transparent}
+.atalho-btn .num{font-size:1.6rem;display:block;line-height:1.1}
+.atalho-btn .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;opacity:.85;margin-top:.2rem;display:block}
+.atalho-aguardando{background:#fff8e1;border-color:#f6c23e;color:#856404}
+.atalho-enviar{background:#e8f5e9;border-color:#1cc88a;color:#155724}
+.atalho-atrasado{background:#fde8e8;border-color:#e74c3c;color:#842029}
+@media(max-width:600px){.atalhos-grid{grid-template-columns:1fr}}
 </style>
 {% endblock %}
 
@@ -71,6 +81,41 @@
     <div class="kpi-value">R$ {{ a_receber_30d|floatformat:2 }}</div>
     <div class="kpi-label">A Receber — 30 Dias</div>
   </div>
+</div>
+
+{% if meta_valor %}
+<div class="dash-section" style="margin-bottom:1.5rem">
+  <h2>Meta do Mês</h2>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.25rem">
+    <span style="font-size:1.1rem;font-weight:700;color:{% if meta_percent >= 100 %}#1cc88a{% elif meta_percent >= 70 %}#f6c23e{% else %}#e74c3c{% endif %}">
+      {{ meta_percent }}%
+    </span>
+    <span style="font-size:.85rem;color:var(--body-quiet-color)">
+      R$ {{ faturamento_mes|floatformat:2 }} / R$ {{ meta_valor|floatformat:2 }}
+    </span>
+  </div>
+  <div class="meta-bar-wrap">
+    <div class="meta-bar" style="width:{{ meta_percent }}%"></div>
+  </div>
+  {% if meta_percent >= 100 %}
+    <p style="margin:.5rem 0 0;font-size:.8rem;color:#1cc88a;font-weight:600">Meta atingida!</p>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="atalhos-grid">
+  <a href="/admin/pedidos/pedido/?status=aguardando_pagamento" class="atalho-btn atalho-aguardando">
+    <span class="num">{{ aguardando_pagamento_count }}</span>
+    <span class="lbl">Aguardando Pagamento</span>
+  </a>
+  <a href="/admin/pedidos/pedido/?status=pago" class="atalho-btn atalho-enviar">
+    <span class="num">{{ a_enviar_count }}</span>
+    <span class="lbl">A Enviar</span>
+  </a>
+  <a href="/admin/pedidos/pedido/?atrasados=1" class="atalho-btn {% if atrasados_count > 0 %}atalho-atrasado{% else %}atalho-enviar{% endif %}">
+    <span class="num">{{ atrasados_count }}</span>
+    <span class="lbl">Atrasados (+3 dias)</span>
+  </a>
 </div>
 
 <div class="kpi-grid" style="margin-bottom:1.5rem">

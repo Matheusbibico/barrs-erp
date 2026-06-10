@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 
 from clientes.models import Cliente
 from core.site_models import SitePedido
-from financeiro.models import LancamentoCaixa
+from financeiro.models import LancamentoCaixa, MetaMensal
 from pedidos.models import ItemPedido, Pagamento, Pedido
 from produtos.models import Produto, VariacaoProduto
 
@@ -157,6 +157,29 @@ def dashboard(request):
         .aggregate(v=Sum('valor'))['v'] or Decimal('0')
     )
 
+    # Meta mensal
+    meta_obj = MetaMensal.objects.filter(ano=hoje.year, mes=hoje.month).first()
+    meta_valor = meta_obj.valor_meta if meta_obj else None
+    meta_percent = (
+        min(int(faturamento_mes / meta_valor * 100), 100)
+        if meta_valor and meta_valor > 0
+        else None
+    )
+
+    # Contadores para atalhos rápidos
+    aguardando_pagamento_count = Pedido.objects.filter(
+        status=Pedido.STATUS_AGUARDANDO
+    ).count()
+    a_enviar_count = Pedido.objects.filter(
+        status=Pedido.STATUS_PAGO, codigo_rastreio=''
+    ).count()
+    tres_dias_atras = timezone.now() - timedelta(days=3)
+    atrasados_count = Pedido.objects.filter(
+        status=Pedido.STATUS_PAGO,
+        codigo_rastreio='',
+        criado_em__lte=tres_dias_atras,
+    ).count()
+
     return render(request, 'admin/dashboard.html', {
         'title': 'Dashboard',
         'faturamento_hoje': faturamento_hoje,
@@ -178,6 +201,11 @@ def dashboard(request):
         'vendas_canal_dados': json.dumps(canal_dados),
         'saldo_caixa': saldo_caixa,
         'a_receber_30d': a_receber_30d,
+        'meta_valor': meta_valor,
+        'meta_percent': meta_percent,
+        'aguardando_pagamento_count': aguardando_pagamento_count,
+        'a_enviar_count': a_enviar_count,
+        'atrasados_count': atrasados_count,
     })
 
 

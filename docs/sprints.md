@@ -15,6 +15,9 @@
 | S3 | Devolução e troca com reversão automática de estoque | ✅ |
 | S4 | Fluxo de caixa, DRE, lançamentos automáticos, categorias financeiras | ✅ |
 | S5 | Parcelamento de pagamentos, módulo de compras com recebimento | ✅ |
+| S6 | Limpeza do sistema — remoção de modelos e campos desnecessários | ✅ |
+| S7 | `estoque_minimo` em Produto/Variação, exportação CSV de vendas e estoque | ✅ |
+| S8 | Meta mensal com barra de progresso, atalhos rápidos no dashboard | ✅ |
 
 ---
 
@@ -56,15 +59,15 @@
 
 #### Tarefas
 
-- [ ] **[BE]** Adicionar `estoque_minimo` (IntegerField, default=0) em `Produto` e `VariacaoProduto`
-- [ ] **[BE]** Dashboard: ajustar card de "Estoque Baixo" para usar `estoque_total <= estoque_minimo` em vez do hardcoded `<= 5`
-- [ ] **[BE]** Dashboard: exibir lista de produtos zerados separada de "abaixo do mínimo"
-- [ ] **[BE]** Endpoint CSV de vendas: `GET /relatorios/vendas.csv?inicio=YYYY-MM-DD&fim=YYYY-MM-DD`
+- [x] **[BE]** Adicionar `estoque_minimo` (IntegerField, default=0) em `Produto` e `VariacaoProduto`
+- [x] **[BE]** Dashboard: ajustar card de "Estoque Baixo" para usar `estoque_total <= estoque_minimo` em vez do hardcoded `<= 5`
+- [x] **[BE]** Dashboard: exibir lista de produtos zerados separada de "abaixo do mínimo"
+- [x] **[BE]** Endpoint CSV de vendas: `GET /relatorios/vendas.csv?inicio=YYYY-MM-DD&fim=YYYY-MM-DD`
   - Colunas: data, nº pedido, cliente, canal, status, total, itens (resumo)
   - Usar `csv` nativo do Python, sem dependência extra
-- [ ] **[BE]** Endpoint CSV de estoque: `GET /relatorios/estoque.csv`
+- [x] **[BE]** Endpoint CSV de estoque: `GET /relatorios/estoque.csv`
   - Colunas: sku, produto, variação, estoque atual, estoque mínimo, custo, preço venda
-- [ ] **[BE]** Links "Exportar CSV" visíveis no Dashboard e nas listas de Produtos/Pedidos
+- [x] **[BE]** Links "Exportar CSV" visíveis no Dashboard
 
 #### Critério de aceite
 - Produto com `estoque_minimo = 3` e `estoque_total = 2` aparece no alerta
@@ -85,13 +88,13 @@
 
 #### Tarefas
 
-- [ ] **[BE]** Criar model simples `MetaMensal` (ano, mes, valor_meta) — ou configuração direta no `settings.py`
-- [ ] **[BE]** Dashboard: card de meta com barra de progresso (R$ atual / R$ meta / %)
-- [ ] **[FE]** Dashboard: botões de atalho rápido para pedidos filtrados:
+- [x] **[BE]** Criar model simples `MetaMensal` (ano, mes, valor_meta) — em `financeiro/models.py`
+- [x] **[BE]** Dashboard: card de meta com barra de progresso (R$ atual / R$ meta / %)
+- [x] **[FE]** Dashboard: botões de atalho rápido para pedidos filtrados:
   - "Aguardando Pagamento (N)"
   - "A Enviar hoje (N)"
   - "Atrasados (N)" — pedidos pagos há mais de 3 dias sem rastreio
-- [ ] **[BE]** Calcular `dias_sem_envio` para pedidos pagos sem `codigo_rastreio`
+- [x] **[BE]** Calcular `atrasados_count` para pedidos pagos sem `codigo_rastreio` há +3 dias
 
 #### Critério de aceite
 - Dashboard mostra meta e progresso sem precisar abrir nenhuma outra página

@@ -153,3 +153,19 @@ class ContaPagar(TimeStampedModel):
 
     def __str__(self):
         return f'{self.categoria} — {self.descricao} — R$ {self.valor}'
+
+
+class MetaMensal(models.Model):
+    ano = models.PositiveSmallIntegerField('Ano')
+    mes = models.PositiveSmallIntegerField('Mês')
+    valor_meta = models.DecimalField('Meta de Faturamento (R$)', max_digits=12, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Meta Mensal'
+        verbose_name_plural = 'Metas Mensais'
+        unique_together = [('ano', 'mes')]
+        ordering = ['-ano', '-mes']
+
+    def __str__(self):
+        import calendar
+        return f'{calendar.month_name[self.mes].capitalize()}/{self.ano} — R$ {self.valor_meta}'

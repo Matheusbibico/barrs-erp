@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
-from .models import CategoriaFinanceira, ContaPagar, ContaReceber, LancamentoCaixa
+from .models import CategoriaFinanceira, ContaPagar, ContaReceber, LancamentoCaixa, MetaMensal
 
 _STATUS_COR = {
     'pendente':  '#C8A040',
@@ -140,3 +140,20 @@ class LancamentoCaixaAdmin(ModelAdmin):
             cor,
             obj.get_tipo_display(),
         )
+
+
+_MESES_PT = [
+    '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+]
+
+
+@admin.register(MetaMensal)
+class MetaMensalAdmin(ModelAdmin):
+    compressed_fields = True
+    list_display = ('mes_ano', 'valor_meta')
+    ordering = ['-ano', '-mes']
+
+    @admin.display(description='Mês/Ano')
+    def mes_ano(self, obj):
+        return f'{_MESES_PT[obj.mes]}/{obj.ano}'

@@ -16,14 +16,13 @@ _STATUS_PRODUTO_COR = {
 class CategoriaAdmin(ModelAdmin):
     compressed_fields = True
     warn_unsaved_form = True
-    list_display = ('nome', 'slug', 'ativa', 'criado_em')
+    list_display = ('nome', 'ativa', 'criado_em')
     list_filter = ('ativa',)
     search_fields = ('nome',)
-    prepopulated_fields = {'slug': ('nome',)}
     list_editable = ('ativa',)
     fieldsets = (
         ('Identificação', {
-            'fields': ('nome', 'slug', 'ativa'),
+            'fields': ('nome', 'ativa'),
         }),
         ('Descrição', {
             'fields': ('descricao',),
@@ -75,7 +74,7 @@ class ProdutoAdmin(ModelAdmin):
     list_fullwidth = True
     list_display = (
         'sku', 'nome', 'categoria', 'preco_venda', 'custo',
-        'estoque_total', 'estoque_reservado', 'status_badge',
+        'estoque_total', 'status_badge',
     )
     list_filter = ('status', 'categoria', 'fornecedor')
     search_fields = ('sku', 'nome', 'descricao')
@@ -84,7 +83,7 @@ class ProdutoAdmin(ModelAdmin):
     inlines = [FotoProdutoInline, VariacaoProdutoInline]
     fieldsets = (
         ('Identificação', {
-            'fields': ('sku', 'nome', 'categoria', 'fornecedor', 'status'),
+            'fields': ('sku', 'nome', 'categoria', 'fornecedor', 'status', 'site_id', 'imagem_url'),
         }),
         ('Descrição', {
             'fields': ('descricao',),
@@ -93,7 +92,7 @@ class ProdutoAdmin(ModelAdmin):
             'fields': ('custo', 'preco_venda'),
         }),
         ('Estoque', {
-            'fields': ('estoque_total', 'estoque_reservado'),
+            'fields': ('estoque_total',),
         }),
         ('Datas', {
             'fields': ('criado_em', 'atualizado_em'),

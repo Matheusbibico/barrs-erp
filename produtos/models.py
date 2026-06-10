@@ -1,11 +1,9 @@
 from django.db import models, transaction
-from django.utils.text import slugify
 from core.models import TimeStampedModel
 
 
 class Categoria(TimeStampedModel):
     nome = models.CharField('Nome', max_length=100)
-    slug = models.SlugField(unique=True, blank=True)
     descricao = models.TextField('Descrição', blank=True)
     ativa = models.BooleanField('Ativa', default=True)
 
@@ -16,11 +14,6 @@ class Categoria(TimeStampedModel):
 
     def __str__(self):
         return self.nome
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.nome)
-        super().save(*args, **kwargs)
 
 
 class Fornecedor(TimeStampedModel):
@@ -66,7 +59,6 @@ class Produto(TimeStampedModel):
     custo = models.DecimalField('Custo (R$)', max_digits=10, decimal_places=2, default=0)
     preco_venda = models.DecimalField('Preço de Venda (R$)', max_digits=10, decimal_places=2)
     estoque_total = models.IntegerField('Estoque Total', default=0)
-    estoque_reservado = models.IntegerField('Estoque Reservado', default=0)
     fornecedor = models.ForeignKey(
         Fornecedor,
         on_delete=models.SET_NULL,
@@ -77,6 +69,7 @@ class Produto(TimeStampedModel):
     )
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default=STATUS_ATIVO)
     site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
+    imagem_url = models.URLField('URL da Imagem', blank=True, default='')
 
     class Meta:
         verbose_name = 'Produto'
@@ -85,10 +78,6 @@ class Produto(TimeStampedModel):
 
     def __str__(self):
         return f'{self.sku} — {self.nome}'
-
-    @property
-    def estoque_disponivel(self):
-        return self.estoque_total - self.estoque_reservado
 
     @property
     def margem(self):

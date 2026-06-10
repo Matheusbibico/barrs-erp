@@ -5,34 +5,42 @@
 
 /* ── 1. Variáveis ──────────────────────────────────────────────────── */
 :root {
-  /* Paleta de conteúdo (área clara) */
-  --b-bg:         #F5F2EC;   /* fundo geral — bege quente        */
+  /* Paleta de conteúdo — cinza neutro premium */
+  --b-bg:         #F9FAFB;   /* fundo geral — gray-50            */
   --b-surface:    #FFFFFF;   /* cards, modais, forms             */
-  --b-border:     #D9D3C7;   /* bordas padrão                    */
-  --b-border-lt:  #EDE9E3;   /* bordas ultra-sutis               */
-  --b-text:       #6B5E53;   /* texto principal                  */
-  --b-muted:      #9E9488;   /* texto secundário / labels        */
-  --b-primary:    #8A947C;   /* verde primário Barrs             */
-  --b-primary-bg: #E8EDE3;   /* fundo verde suave                */
-  --b-gold:       #C8A96A;   /* destaque / alertas leves         */
-  --b-danger:     #C07070;   /* erro / crítico                   */
+  --b-surface-soft: #F9FAFB; /* thead, áreas levemente distintas */
+  --b-border:     #E5E7EB;   /* bordas padrão — gray-200         */
+  --b-border-lt:  #F3F4F6;   /* bordas ultra-sutis — gray-100    */
+  --b-text:       #111827;   /* texto principal — gray-900       */
+  --b-text-mid:   #374151;   /* texto secundário — gray-700      */
+  --b-muted:      #6B7280;   /* labels / meta — gray-500         */
+  --b-primary:    #2E5219;   /* verde floresta — autoritativo    */
+  --b-primary-mid: #3D6B22;  /* verde médio                      */
+  --b-primary-bg: #F0FDF4;   /* fundo verde suave — green-50     */
+  --b-gold:       #B45309;   /* amber-700                        */
+  --b-danger:     #DC2626;   /* red-600                          */
 
-  /* Sidebar — sempre escura */
-  --b-sb-bg:       #2C2420;
-  --b-sb-border:   #3A302B;
-  --b-sb-text:     #9E9488;
-  --b-sb-hover:    #D9D3C7;
+  /* Sidebar — sempre escura (slate-950) */
+  --b-sb-bg:       #0F172A;
+  --b-sb-border:   rgba(255, 255, 255, 0.07);
+  --b-sb-text:     #94A3B8;   /* slate-400                        */
+  --b-sb-hover:    #F1F5F9;   /* slate-100                        */
   --b-sb-active:   #FFFFFF;
-  --b-sb-active-bg: #8A947C;
-  --b-sb-group:    #6B5E53;
-  --b-sb-brand:    #C8A96A;   /* título "Barrs ERP" na sidebar   */
+  --b-sb-active-bg: rgba(255, 255, 255, 0.10);
+  --b-sb-group:    #475569;   /* slate-600                        */
+  --b-sb-brand:    #F8FAFC;   /* slate-50                         */
 
   /* Tokens de forma */
-  --b-radius:    10px;
+  --b-radius:    8px;
   --b-radius-sm:  6px;
-  --b-shadow:    0 1px 4px rgba(107, 94, 83, 0.08);
-  --b-shadow-md: 0 4px 16px rgba(107, 94, 83, 0.10);
-  --b-row-alt:   #FBFAF7;
+  --b-shadow:    0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --b-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.05);
+  --b-row-alt:   #FAFAFA;
+
+  /* Aliases de compatibilidade para regras legadas */
+  --b-sb-bg-2:       #0F172A;  /* alias → --b-sb-bg */
+  --b-primary-strong: #2E5219; /* alias → --b-primary */
+  --b-surface-raised: #FFFFFF; /* alias → --b-surface */
 }
 
 /* ── 2. Força light mode — neutraliza dark:bg-base-900 do Alpine.js/Tailwind ──
@@ -755,38 +763,9 @@ input[type="button"],
   color: #F7F5EF !important;
 }
 
-/* ── 14. Premium polish — Barrs ERP ─────────────────────────────────
-   Camada final para dar unidade visual ao admin: nada de branco puro
-   espalhado, nada de preto herdado do dark mode, e superfícies com
-   profundidade sutil de sistema profissional. */
-:root {
-  --b-bg: #F4F0E8;
-  --b-surface: #FFFCF6;
-  --b-surface-soft: #FAF6EE;
-  --b-surface-raised: #FFFFFF;
-  --b-border: #D8CFC0;
-  --b-border-lt: #EEE7DC;
-  --b-text: #574D43;
-  --b-muted: #8F8477;
-  --b-primary: #7F8B70;
-  --b-primary-strong: #66745B;
-  --b-primary-bg: #E9EEE2;
-  --b-gold: #B98F3E;
-  --b-danger: #B95E5E;
-  --b-row-alt: #FAF6EF;
-  --b-sb-bg: #241D19;
-  --b-sb-bg-2: #2D2520;
-  --b-sb-border: rgba(255, 255, 255, 0.08);
-  --b-sb-text: #B8AEA1;
-  --b-sb-hover: #F1E7D8;
-  --b-sb-active-bg: #89947A;
-  --b-sb-group: #817568;
-  --b-sb-brand: #E8D7B4;
-  --b-radius: 8px;
-  --b-radius-sm: 6px;
-  --b-shadow: 0 1px 2px rgba(55, 45, 37, 0.08), 0 12px 28px rgba(55, 45, 37, 0.06);
-  --b-shadow-md: 0 2px 8px rgba(55, 45, 37, 0.10), 0 18px 42px rgba(55, 45, 37, 0.10);
-}
+/* ── 14. Resolvido — variáveis consolidadas na section 1 ─────────────
+   Paleta completa definida no topo do arquivo (section 1).
+   barrs_premium.css adiciona tipografia e componentes visuais. */
 
 html,
 html.dark,
@@ -840,9 +819,7 @@ aside,
 .sidebar,
 [class*="sidebar"],
 [class*="nav-sidebar"] {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 180px),
-    linear-gradient(180deg, var(--b-sb-bg-2), var(--b-sb-bg)) !important;
+  background: var(--b-sb-bg) !important;
   border-right-color: var(--b-sb-border) !important;
 }
 

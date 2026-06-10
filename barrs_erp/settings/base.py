@@ -140,43 +140,43 @@ UNFOLD = {
     ],
     "SCRIPTS": [],
 
-    # Paleta de cores da Barrs convertida para oklch
+    # Paleta de cores convertida para oklch — cinza neutro premium
     "COLORS": {
-        # Neutros: escala de bege quente → marrom escuro
+        # Neutros: escala cinza fria — Linear/Stripe style
         "base": {
-            "50":  "oklch(99.1% 0.003 84.6)",   # quase branco aquecido
-            "100": "oklch(96.2% 0.009 84.6)",   # #F5F2EC — fundo principal
-            "200": "oklch(92.6% 0.014 84.6)",   # #EBE6DC
-            "300": "oklch(86.8% 0.018 84.6)",   # #D9D3C7 — bordas
-            "400": "oklch(79.3% 0.017 73.6)",   # cinza-bege médio
-            "500": "oklch(67.2% 0.021 72.5)",   # #9E9488 — texto muted
-            "600": "oklch(56.4% 0.021 75.2)",   # tom médio
-            "700": "oklch(49.1% 0.024 62.5)",   # #6B5E53 — texto principal
-            "800": "oklch(39.9% 0.016 48.3)",   # escuro
-            "900": "oklch(30.7% 0.012 51.7)",   # muito escuro
-            "950": "oklch(22.2% 0.007 48.4)",   # quase preto
+            "50":  "oklch(98.2% 0.002 256)",   # #F9FAFB — fundo geral
+            "100": "oklch(96.3% 0.003 256)",   # #F3F4F6
+            "200": "oklch(92.4% 0.004 256)",   # #E5E7EB — bordas
+            "300": "oklch(87.2% 0.006 256)",   # #D1D5DB
+            "400": "oklch(71.0% 0.007 256)",   # #9CA3AF — placeholder
+            "500": "oklch(55.8% 0.008 256)",   # #6B7280 — muted
+            "600": "oklch(43.8% 0.006 256)",   # #4B5563
+            "700": "oklch(36.4% 0.005 256)",   # #374151 — texto secundário
+            "800": "oklch(26.0% 0.004 256)",   # #1F2937
+            "900": "oklch(18.5% 0.003 256)",   # #111827 — texto principal
+            "950": "oklch(12.0% 0.002 256)",   # #0F172A — sidebar
         },
-        # Primário: escala do verde Barrs #8A947C
+        # Primário: verde floresta — mais escuro e autoritativo
         "primary": {
-            "50":  "oklch(94.0% 0.014 128.6)",  # #E8EDE3 — fundo verde
-            "100": "oklch(89.7% 0.023 126.3)",
-            "200": "oklch(84.1% 0.036 130.5)",
-            "300": "oklch(79.6% 0.036 125.0)",  # #B7C1A8 — verde claro
-            "400": "oklch(71.9% 0.046 126.1)",
-            "500": "oklch(65.2% 0.037 125.8)",  # #8A947C — verde primário
-            "600": "oklch(57.1% 0.036 126.7)",
-            "700": "oklch(48.9% 0.033 127.3)",
-            "800": "oklch(40.8% 0.029 128.2)",
-            "900": "oklch(32.6% 0.026 129.4)",
-            "950": "oklch(24.8% 0.018 131.4)",
+            "50":  "oklch(97.2% 0.020 143)",   # fundo verde suave
+            "100": "oklch(93.4% 0.042 143)",
+            "200": "oklch(87.8% 0.068 143)",
+            "300": "oklch(80.4% 0.090 143)",
+            "400": "oklch(70.0% 0.112 143)",
+            "500": "oklch(58.0% 0.122 143)",   # verde médio
+            "600": "oklch(47.4% 0.106 143)",   # #3D6B22 — primário forte
+            "700": "oklch(38.0% 0.086 143)",   # #2E5219 — primário escuro
+            "800": "oklch(29.5% 0.066 143)",
+            "900": "oklch(21.8% 0.048 143)",
+            "950": "oklch(15.0% 0.033 143)",
         },
         "font": {
-            "subtle-light":    "var(--color-base-500)",  # texto muted
+            "subtle-light":    "var(--color-base-500)",  # muted
             "subtle-dark":     "var(--color-base-400)",
-            "default-light":   "var(--color-base-700)",  # texto principal
-            "default-dark":    "var(--color-base-300)",
-            "important-light": "var(--color-base-900)",  # títulos
-            "important-dark":  "var(--color-base-100)",
+            "default-light":   "var(--color-base-900)",  # alto contraste
+            "default-dark":    "var(--color-base-200)",
+            "important-light": "var(--color-base-950)",  # títulos máximo contraste
+            "important-dark":  "var(--color-base-50)",
         },
     },
 

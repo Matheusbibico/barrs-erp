@@ -55,12 +55,15 @@ class PedidoAdmin(ModelAdmin):
     compressed_fields = True
     warn_unsaved_form = True
     list_fullwidth = True
+    list_per_page = 25
+    show_full_result_count = False
     list_display = (
         'codigo', 'cliente', 'canal', 'status_badge',
         'total_liquido', 'usuario', 'criado_em',
     )
     list_filter = ('status', 'canal', 'criado_em')
-    search_fields = ('cliente__nome', 'cliente__whatsapp', 'id')
+    ordering = ['-id']
+    search_fields = ('=id', 'cliente__nome', 'cliente__whatsapp')
     list_select_related = ('cliente', 'usuario')
     readonly_fields = ('total_bruto', 'criado_em', 'atualizado_em')
     inlines = [ItemPedidoInline, PagamentoInline, EventoRastreioInline]

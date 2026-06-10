@@ -1,4 +1,5 @@
 {% extends "unfold/layouts/base_simple.html" %}
+{% load static %}
 
 {% block branding %}
     {% include "unfold/helpers/site_branding.html" %}
@@ -7,6 +8,10 @@
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrahead %}
+{# Preload da fonte Material Symbols — elimina FOUC (ícones aparecendo como texto) #}
+<link rel="preload"
+      href="{% static 'unfold/fonts/material-symbols/Material-Symbols-Outlined.woff2' %}"
+      as="font" type="font/woff2" crossorigin="anonymous">
 <script>
 (function(){
   try {

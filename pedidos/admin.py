@@ -4,8 +4,8 @@ from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 
 from .models import (
-    Devolucao, EventoRastreio, ItemDevolucao,
-    ItemPedido, LucroPedido, Pagamento, ParcelaPagamento, Pedido,
+    Devolucao, ItemDevolucao,
+    ItemPedido, Pagamento, Pedido,
 )
 
 # Cores Barrs para cada status de pedido
@@ -41,13 +41,6 @@ class PagamentoInline(TabularInline):
     fields = ('metodo', 'valor', 'status', 'pago_em')
 
 
-class EventoRastreioInline(TabularInline):
-    model = EventoRastreio
-    extra = 0
-    fields = ('data_evento', 'status', 'descricao', 'local')
-    ordering = ['-data_evento']
-
-
 @admin.register(Pedido)
 class PedidoAdmin(ModelAdmin):
     compressed_fields = True
@@ -64,7 +57,7 @@ class PedidoAdmin(ModelAdmin):
     search_fields = ('=id', 'cliente__nome', 'cliente__whatsapp')
     list_select_related = ('cliente',)
     readonly_fields = ('total_bruto', 'criado_em', 'atualizado_em')
-    inlines = [ItemPedidoInline, PagamentoInline, EventoRastreioInline]
+    inlines = [ItemPedidoInline, PagamentoInline]
     date_hierarchy = 'criado_em'
     fieldsets = (
         ('Pedido', {
@@ -101,14 +94,6 @@ class PedidoAdmin(ModelAdmin):
         )
 
 
-class ParcelaPagamentoInline(TabularInline):
-    model = ParcelaPagamento
-    fk_name = 'pagamento'
-    extra = 0
-    readonly_fields = ('numero', 'vencimento', 'valor', 'pago_em')
-    fields = ('numero', 'vencimento', 'valor', 'status', 'pago_em')
-
-
 @admin.register(Pagamento)
 class PagamentoAdmin(ModelAdmin):
     compressed_fields = True
@@ -117,7 +102,6 @@ class PagamentoAdmin(ModelAdmin):
     list_filter = ('status', 'metodo')
     search_fields = ('pedido__cliente__nome',)
     list_select_related = ('pedido', 'pedido__cliente')
-    inlines = [ParcelaPagamentoInline]
     fieldsets = (
         ('Pagamento', {
             'fields': ('pedido', 'metodo', 'valor', 'parcelas'),
@@ -126,46 +110,6 @@ class PagamentoAdmin(ModelAdmin):
             'fields': ('status', 'pago_em', 'observacoes'),
         }),
     )
-
-
-@admin.register(LucroPedido)
-class LucroPedidoAdmin(ModelAdmin):
-    compressed_fields = True
-    list_fullwidth = True
-    list_display = (
-        'pedido', 'receita_bruta', 'custo_produtos',
-        'taxa_pagamento', 'frete', 'embalagem', 'lucro_liquido',
-    )
-    search_fields = ('pedido__cliente__nome',)
-    list_select_related = ('pedido', 'pedido__cliente')
-    readonly_fields = (
-        'pedido', 'receita_bruta', 'custo_produtos',
-        'lucro_liquido', 'criado_em', 'atualizado_em',
-    )
-    fieldsets = (
-        ('Pedido', {
-            'fields': ('pedido',),
-        }),
-        ('Receitas', {
-            'fields': ('receita_bruta',),
-        }),
-        ('Custos', {
-            'fields': ('custo_produtos', 'taxa_pagamento', 'frete', 'embalagem'),
-        }),
-        ('Resultado', {
-            'fields': ('lucro_liquido',),
-        }),
-        ('Datas', {
-            'fields': ('criado_em', 'atualizado_em'),
-            'classes': ('collapse',),
-        }),
-    )
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 
 class ItemDevolucaoInline(TabularInline):

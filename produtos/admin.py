@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 
-from .models import Categoria, Fornecedor, Produto, FotoProduto, VariacaoProduto
+from .models import Categoria, Fornecedor, Produto, VariacaoProduto
 
 # Mapeamento status → cor Barrs (hex)
 _STATUS_PRODUTO_COR = {
@@ -55,12 +55,6 @@ class FornecedorAdmin(ModelAdmin):
     )
 
 
-class FotoProdutoInline(TabularInline):
-    model = FotoProduto
-    extra = 1
-    fields = ('imagem', 'principal', 'ordem')
-
-
 class VariacaoProdutoInline(TabularInline):
     model = VariacaoProduto
     extra = 1
@@ -80,7 +74,7 @@ class ProdutoAdmin(ModelAdmin):
     search_fields = ('sku', 'nome', 'descricao')
     list_select_related = ('categoria', 'fornecedor')
     readonly_fields = ('criado_em', 'atualizado_em')
-    inlines = [FotoProdutoInline, VariacaoProdutoInline]
+    inlines = [VariacaoProdutoInline]
     fieldsets = (
         ('Identificação', {
             'fields': ('sku', 'nome', 'categoria', 'fornecedor', 'status', 'site_id', 'imagem_url'),

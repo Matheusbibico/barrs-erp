@@ -1,5 +1,16 @@
+import calendar
+from datetime import date
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+
+def _add_months(d, months):
+    month = d.month - 1 + months
+    year = d.year + month // 12
+    month = month % 12 + 1
+    day = min(d.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
 
 
 @receiver(post_save, sender='pedidos.Pedido')
@@ -104,3 +115,44 @@ def processar_aprovacao_devolucao(sender, instance, **kwargs):
         # 4. Registra aprovada_em se ainda não preenchido
         if not instance.aprovada_em:
             sender.objects.filter(pk=instance.pk).update(aprovada_em=tz.now())
+
+
+@receiver(post_save, sender='pedidos.Pagamento')
+def gerar_parcelas_pagamento(sender, instance, created, **kwargs):
+    """Ao criar Pagamento com parcelas > 1 → gera ParcelaPagamento + ContaReceber por parcela."""
+    if not created or instance.parcelas <= 1:
+        return
+
+    from decimal import Decimal, ROUND_HALF_UP
+    from django.db import transaction
+    from django.utils import timezone as tz
+    from financeiro.models import ContaReceber
+    from .models import ParcelaPagamento
+
+    hoje = instance.pago_em.date() if instance.pago_em else tz.localdate()
+    valor_parcela = (instance.valor / Decimal(instance.parcelas)).quantize(
+        Decimal('0.01'), rounding=ROUND_HALF_UP
+    )
+    # Ajuste de centavos na última parcela
+    total_calculado = valor_parcela * instance.parcelas
+    ajuste = instance.valor - total_calculado
+
+    with transaction.atomic():
+        for i in range(1, instance.parcelas + 1):
+            venc = _add_months(hoje, i)
+            val = valor_parcela + (ajuste if i == instance.parcelas else Decimal('0'))
+            ParcelaPagamento.objects.create(
+                pagamento=instance,
+                numero=i,
+                vencimento=venc,
+                valor=val,
+                status=ParcelaPagamento.STATUS_PENDENTE,
+            )
+            ContaReceber.objects.create(
+                cliente=instance.pedido.cliente,
+                pedido=instance.pedido,
+                descricao=f'Parcela {i}/{instance.parcelas} — {instance.get_metodo_display()}',
+                valor=val,
+                vencimento=venc,
+                status='pendente',
+            )

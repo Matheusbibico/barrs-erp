@@ -5,7 +5,7 @@ from unfold.admin import ModelAdmin, TabularInline
 
 from .models import (
     Devolucao, EventoRastreio, ItemDevolucao,
-    ItemPedido, LucroPedido, Pagamento, Pedido,
+    ItemPedido, LucroPedido, Pagamento, ParcelaPagamento, Pedido,
 )
 
 # Cores Barrs para cada status de pedido
@@ -103,17 +103,26 @@ class PedidoAdmin(ModelAdmin):
         )
 
 
+class ParcelaPagamentoInline(TabularInline):
+    model = ParcelaPagamento
+    fk_name = 'pagamento'
+    extra = 0
+    readonly_fields = ('numero', 'vencimento', 'valor', 'pago_em')
+    fields = ('numero', 'vencimento', 'valor', 'status', 'pago_em')
+
+
 @admin.register(Pagamento)
 class PagamentoAdmin(ModelAdmin):
     compressed_fields = True
     list_fullwidth = True
-    list_display = ('pedido', 'metodo', 'valor', 'status', 'pago_em')
+    list_display = ('pedido', 'metodo', 'valor', 'parcelas', 'status', 'pago_em')
     list_filter = ('status', 'metodo')
     search_fields = ('pedido__cliente__nome',)
     list_select_related = ('pedido', 'pedido__cliente')
+    inlines = [ParcelaPagamentoInline]
     fieldsets = (
         ('Pagamento', {
-            'fields': ('pedido', 'metodo', 'valor'),
+            'fields': ('pedido', 'metodo', 'valor', 'parcelas'),
         }),
         ('Status', {
             'fields': ('status', 'pago_em', 'observacoes'),

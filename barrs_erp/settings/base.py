@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'pedidos',
     'estoque',
     'financeiro',
+    'compras',
 ]
 
 MIDDLEWARE = [
@@ -261,6 +262,18 @@ UNFOLD = {
                         "title": "Fornecedores",
                         "icon": "local_shipping",
                         "link": reverse_lazy("admin:produtos_fornecedor_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": "Pedidos de Compra",
+                        "icon": "shopping_cart",
+                        "link": reverse_lazy("admin:compras_pedidocompra_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": "Recebimentos",
+                        "icon": "inventory",
+                        "link": reverse_lazy("admin:compras_recebimentomercadoria_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
                 ],

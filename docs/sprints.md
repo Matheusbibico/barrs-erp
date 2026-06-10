@@ -308,3 +308,222 @@
 - Sprint 7 (NF-e) requer conta em Focus NFe / NFe.io e certificado digital A1 da empresa
 - Sprint 9 (ML) requer conta de desenvolvedor no Mercado Livre
 - Sprints podem ser paralelizadas por desenvolvedor humano (ex: Sprint 6 backend + Sprint 5 testes)
+
+---
+
+## Manual de Uso — Sprints Implementadas
+
+> Como operar cada funcionalidade no dia a dia da loja.
+
+---
+
+### Manual Sprint 4 — Fluxo de Caixa e DRE
+
+#### 1. Categorias Financeiras
+
+**Onde:** Admin → sidebar → **Categorias Financeiras**
+
+Antes de usar o caixa, crie a estrutura de categorias **uma única vez**. Sugestão:
+
+| Nome | Tipo | Pai |
+|------|------|-----|
+| Vendas | Receita | — |
+| Vendas Site | Receita | Vendas |
+| Vendas WhatsApp | Receita | Vendas |
+| Despesas Operacionais | Despesa | — |
+| Aluguel | Despesa | Despesas Operacionais |
+| Embalagem | Despesa | Despesas Operacionais |
+| Frete Saída | Despesa | Despesas Operacionais |
+| Marketing | Despesa | — |
+| Tráfego Pago | Despesa | Marketing |
+| Compras | Despesa | — |
+
+> Não precisa criar tudo de uma vez. Vá adicionando conforme a necessidade.
+
+---
+
+#### 2. Lançamentos de Caixa
+
+**Onde:** Admin → sidebar → **Lançamentos de Caixa**
+
+**Modo automático** (zero trabalho):
+- Quando um **Pagamento** de pedido é aprovado → entra automaticamente como **Entrada / Vendas**
+- Quando uma **Conta a Pagar** é marcada como **pago** → sai automaticamente como **Saída**
+
+**Modo manual** (para despesas variáveis):
+
+| Situação | Tipo | Categoria |
+|----------|------|-----------|
+| Pagou aluguel do mês | Saída | Aluguel |
+| Comprou caixas/embalagem | Saída | Embalagem |
+| Recebeu dinheiro em espécie | Entrada | Vendas Presencial |
+| Pagou imposto | Saída | Impostos |
+
+Preencha: **Data**, **Tipo**, **Valor**, **Categoria**, **Descrição**.  
+O campo **Conciliado** serve para marcar lançamentos já conferidos com o extrato bancário.
+
+---
+
+#### 3. Fluxo de Caixa
+
+**Acesse:** `/api/financeiro/fluxo-caixa/`
+
+```
+# Mês atual (padrão)
+/api/financeiro/fluxo-caixa/
+
+# Período específico
+/api/financeiro/fluxo-caixa/?inicio=2026-06-01&fim=2026-06-30
+```
+
+Retorna dia a dia: entradas, saídas e **saldo acumulado**.  
+Use para responder: *"Tenho caixa para pagar as contas dessa semana?"*
+
+O **card "Saldo em Caixa"** no Dashboard já mostra o total em tempo real.
+
+---
+
+#### 4. DRE — Demonstrativo de Resultado
+
+**Acesse:** `/api/financeiro/dre/`
+
+```
+# Mês atual
+/api/financeiro/dre/
+
+# Mês específico
+/api/financeiro/dre/?ano=2026&mes=5
+```
+
+Estrutura do retorno:
+```
+Receita Bruta      R$ 12.000   ← pedidos pagos no mês
+(-) CMV            R$  4.500   ← custo dos produtos vendidos
+= Lucro Bruto      R$  7.500   (62,5%)
+(-) Despesas       R$  2.000   ← aluguel, marketing, embalagem...
+= Lucro Líquido    R$  5.500   (45,8%)
+```
+
+Use no **fechamento mensal** para saber se o mês foi lucrativo.
+
+---
+
+#### 5. Rotina mensal recomendada
+
+```
+1º dia do mês
+  → Cadastre despesas fixas do mês como "Conta a Pagar"
+    (aluguel, sistema, contador, etc.)
+
+Durante o mês
+  → Lançamentos de vendas entram automaticamente
+  → Ao pagar uma conta: mude ContaPagar para "pago"
+    (o lançamento de saída é criado sozinho)
+  → Despesas variáveis: lance manualmente
+
+Final do mês
+  → Acesse /api/financeiro/dre/ para ver o resultado
+  → Confira o Fluxo de Caixa e marque lançamentos como "Conciliado"
+    após conferir com o extrato bancário
+```
+
+---
+
+### Manual Sprint 5 — Parcelamento e Módulo de Compras
+
+#### 1. Pagamento Parcelado
+
+**Onde:** Admin → Pedido → aba **Pagamentos** → ou Admin → **Pagamentos**
+
+Ao criar um **Pagamento** com campo **"Nº de Parcelas" > 1**:
+
+- O sistema gera automaticamente N parcelas com vencimentos mensais
+- Cada parcela também cria uma **Conta a Receber** individual
+- As parcelas ficam visíveis no inline do PagamentoAdmin
+
+**Exemplo — venda de R$ 300 em 3x:**
+```
+Parcela 1/3 — R$ 100,00 — vence 10/07
+Parcela 2/3 — R$ 100,00 — vence 10/08
+Parcela 3/3 — R$ 100,00 — vence 10/09
+```
+
+> O vencimento da 1ª parcela é calculado 1 mês após a data do pagamento.  
+> Diferenças de centavos (arredondamento) vão para a última parcela.
+
+O **card "A Receber — 30 Dias"** no Dashboard mostra o total de parcelas/contas a receber pendentes nos próximos 30 dias.
+
+---
+
+#### 2. Pedido de Compra
+
+**Onde:** Admin → sidebar → **Pedidos de Compra**
+
+Use quando for comprar mercadoria de um fornecedor.
+
+**Passo a passo:**
+
+**a) Criar o Pedido de Compra**
+1. Clique em **+ Adicionar Pedido de Compra**
+2. Selecione o **Fornecedor**
+3. Preencha **Nº do Pedido** (número da NF ou pedido do fornecedor — opcional)
+4. Defina **Previsão de Entrega**
+5. No inline **Itens**, adicione cada produto com **quantidade** e **custo unitário**
+6. Salve → o **Total** é calculado automaticamente
+7. Mude o status para **"Enviado ao Fornecedor"** quando o pedido for feito
+
+**Status do ciclo de compra:**
+```
+Rascunho → Enviado ao Fornecedor → Recebido Parcialmente → Recebido Completo
+```
+
+---
+
+#### 3. Recebimento de Mercadoria
+
+**Onde:** Admin → sidebar → **Recebimentos**
+
+Quando a mercadoria chegar:
+
+1. Clique em **+ Adicionar Recebimento de Mercadoria**
+2. Selecione o **Pedido de Compra** correspondente
+3. Informe a **Data** de chegada e o **usuário** que recebeu
+4. No inline **Itens**, informe para cada produto:
+   - **Qtd Recebida** (pode ser menor que o pedido — recebimento parcial)
+   - **Condição**: Ok ou Avariado
+5. Marque **Confirmado = Sim**
+6. Salve
+
+**O que acontece automaticamente ao confirmar:**
+- Estoque dos produtos é **incrementado** com a quantidade recebida
+- **Custo médio ponderado** do produto é recalculado
+- **Conta a Pagar** é criada automaticamente para o fornecedor
+- Status do Pedido de Compra é atualizado para **Recebido Parcialmente** ou **Recebido Completo**
+
+> **Atenção:** só itens com condição **"Ok"** entram no estoque. Avariados são registrados mas não movimentam.
+
+---
+
+#### 4. Fluxo prático de compra
+
+```
+1. Receber cotação do fornecedor
+   → Criar Pedido de Compra com status "Rascunho"
+   → Adicionar itens com custo unitário da cotação
+
+2. Fechar a compra
+   → Mudar status para "Enviado ao Fornecedor"
+   → Anotar o Nº do Pedido/NF do fornecedor
+
+3. Mercadoria chegou
+   → Criar Recebimento de Mercadoria
+   → Informar qtd recebida por item e condição
+   → Marcar como Confirmado
+   → Sistema entra estoque + cria ContaPagar automaticamente
+
+4. Pagar o fornecedor
+   → Ir em Contas a Pagar
+   → Localizar a conta gerada pelo recebimento
+   → Marcar como "pago" + data de pagamento
+   → Lançamento de saída no caixa é criado automaticamente
+```

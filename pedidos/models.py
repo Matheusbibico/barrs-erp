@@ -177,6 +177,7 @@ class Pagamento(TimeStampedModel):
     )
     metodo = models.CharField('Método', max_length=20, choices=METODO_CHOICES)
     valor = models.DecimalField('Valor (R$)', max_digits=12, decimal_places=2)
+    parcelas = models.PositiveSmallIntegerField('Nº de Parcelas', default=1)
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
     pago_em = models.DateTimeField('Pago em', null=True, blank=True)
     observacoes = models.CharField('Observações', max_length=200, blank=True)
@@ -323,3 +324,34 @@ class ItemDevolucao(TimeStampedModel):
 
     def __str__(self):
         return f'{self.quantidade}x {self.item_pedido.produto.nome} ({self.get_condicao_display()})'
+
+
+class ParcelaPagamento(TimeStampedModel):
+    STATUS_PENDENTE = 'pendente'
+    STATUS_PAGO = 'pago'
+    STATUS_VENCIDO = 'vencido'
+    STATUS_CHOICES = [
+        (STATUS_PENDENTE, 'Pendente'),
+        (STATUS_PAGO, 'Pago'),
+        (STATUS_VENCIDO, 'Vencido'),
+    ]
+
+    pagamento = models.ForeignKey(
+        Pagamento,
+        on_delete=models.CASCADE,
+        related_name='itens_parcela',
+        verbose_name='Pagamento',
+    )
+    numero = models.PositiveSmallIntegerField('Nº da Parcela')
+    vencimento = models.DateField('Vencimento')
+    valor = models.DecimalField('Valor (R$)', max_digits=12, decimal_places=2)
+    status = models.CharField('Status', max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
+    pago_em = models.DateField('Pago em', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Parcela'
+        verbose_name_plural = 'Parcelas'
+        ordering = ['pagamento', 'numero']
+
+    def __str__(self):
+        return f'Parcela {self.numero}/{self.pagamento.parcelas} — R$ {self.valor}'

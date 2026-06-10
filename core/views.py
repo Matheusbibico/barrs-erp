@@ -132,6 +132,14 @@ def dashboard(request):
     )
     saldo_caixa = (saldo_caixa_agg['entradas'] or Decimal('0')) - (saldo_caixa_agg['saidas'] or Decimal('0'))
 
+    from financeiro.models import ContaReceber
+    trinta_dias_frente = hoje + timedelta(days=30)
+    a_receber_30d = (
+        ContaReceber.objects
+        .filter(status='pendente', vencimento__lte=trinta_dias_frente)
+        .aggregate(v=Sum('valor'))['v'] or Decimal('0')
+    )
+
     return render(request, 'admin/dashboard.html', {
         'title': 'Dashboard',
         'faturamento_hoje': faturamento_hoje,
@@ -151,6 +159,7 @@ def dashboard(request):
         'vendas_canal_labels': json.dumps(canal_labels),
         'vendas_canal_dados': json.dumps(canal_dados),
         'saldo_caixa': saldo_caixa,
+        'a_receber_30d': a_receber_30d,
     })
 
 

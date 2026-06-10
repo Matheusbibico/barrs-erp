@@ -67,6 +67,10 @@
     <div class="kpi-value">R$ {{ saldo_caixa|floatformat:2 }}</div>
     <div class="kpi-label"><a href="/api/financeiro/fluxo-caixa/" style="color:inherit;text-decoration:none;">Saldo em Caixa</a></div>
   </div>
+  <div class="kpi-card">
+    <div class="kpi-value">R$ {{ a_receber_30d|floatformat:2 }}</div>
+    <div class="kpi-label">A Receber — 30 Dias</div>
+  </div>
 </div>
 
 <div class="kpi-grid" style="margin-bottom:1.5rem">

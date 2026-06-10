@@ -1,0 +1,15 @@
+/* Override de static/unfold/fonts/material-symbols/styles.css do Unfold.
+   Django collectstatic prioriza STATICFILES_DIRS > app statics, portanto
+   este arquivo substitui a versão do pacote no servidor.
+
+   MUDANÇA: adicionado font-display: block.
+   Sem font-display, o default (auto/swap) faz o browser exibir o texto
+   da ligadura ("storefront", "add") enquanto a fonte carrega. Com "block",
+   os ícones ficam invisíveis até a fonte carregar — sem texto de fallback. */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("Material-Symbols-Outlined.woff2") format("woff2");
+}

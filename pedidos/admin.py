@@ -58,13 +58,13 @@ class PedidoAdmin(ModelAdmin):
     list_per_page = 25
     show_full_result_count = False
     list_display = (
-        'codigo', 'cliente', 'canal', 'status_badge',
-        'total_liquido', 'usuario', 'criado_em',
+        'codigo', 'cliente', 'status_badge',
+        'total_liquido', 'canal', 'criado_em',
     )
     list_filter = ('status', 'canal', 'criado_em')
     ordering = ['-id']
     search_fields = ('=id', 'cliente__nome', 'cliente__whatsapp')
-    list_select_related = ('cliente', 'usuario')
+    list_select_related = ('cliente',)
     readonly_fields = ('total_bruto', 'criado_em', 'atualizado_em')
     inlines = [ItemPedidoInline, PagamentoInline, EventoRastreioInline]
     date_hierarchy = 'criado_em'
@@ -92,15 +92,13 @@ class PedidoAdmin(ModelAdmin):
 
     @admin.display(description='Código', ordering='id')
     def codigo(self, obj):
-        return f'#{str(obj.id)[:8].upper()}'
+        return format_html('<span class="bd-order-id">#{}</span>', str(obj.id)[:8].upper())
 
     @admin.display(description='Status', ordering='status')
     def status_badge(self, obj):
-        cor = _STATUS_PEDIDO_COR.get(obj.status, '#9E9488')
         return format_html(
-            '<span style="background:{};color:#fff;padding:2px 10px;'
-            'border-radius:6px;font-size:11px;font-weight:500;">{}</span>',
-            cor,
+            '<span class="bd-badge bd-badge--{}">{}</span>',
+            obj.status,
             obj.get_status_display(),
         )
 

@@ -302,7 +302,7 @@ div[class*="border-t"]:has(.cursor-pointer) {
 .barrs-table td {
   border-top: 1px solid var(--b-border-soft) !important;
   color: var(--b-text) !important;
-  height: 44px !important;
+  height: 50px !important;
   padding: 0 16px !important;
 }
 
@@ -1171,4 +1171,62 @@ div[class*="border-t"]:has(.cursor-pointer) {
   .bd-table tbody td {
     height: 44px;
   }
+}
+
+/* ── Pedidos changelist — hierarquia visual ──────────────────────── */
+
+/* Código: referência técnica — pequeno, monospace, cinza */
+#main #result_list .field-codigo,
+#main #result_list .field-codigo a {
+  font-family: "ui-monospace", "SFMono-Regular", Menlo, monospace !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--b-muted) !important;
+  letter-spacing: 0.02em !important;
+  text-decoration: none !important;
+}
+
+#main #result_list .field-codigo a:hover {
+  color: var(--b-primary-mid) !important;
+  text-decoration: underline !important;
+}
+
+/* Cliente: coluna herói — texto principal */
+#main #result_list .field-cliente,
+#main #result_list .field-cliente a {
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  color: var(--b-text) !important;
+}
+
+/* Total: tabular nums, alinhado à direita */
+#main #result_list .field-total_liquido,
+#main #result_list th.column-total_liquido {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  padding-right: 20px !important;
+}
+
+/* Canal e data: secundários */
+#main #result_list .field-canal,
+#main #result_list .field-criado_em {
+  color: var(--b-muted) !important;
+  font-size: 12.5px !important;
+}
+
+#main #result_list .field-criado_em {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cabeçalho da coluna total — alinhado à direita */
+#main #result_list th.column-total_liquido a,
+#main #result_list th.column-total_liquido {
+  text-align: right !important;
+}
+
+/* Paginação compacta */
+#main .paginator,
+#main p.paginator {
+  font-size: 12px !important;
+  padding: 10px 16px !important;
 }

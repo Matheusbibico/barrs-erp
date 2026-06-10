@@ -83,6 +83,15 @@
       DRE — Demonstrativo de Resultado
     </a>
   </div>
+  <div class="kpi-card" style="text-align:left">
+    <div class="kpi-label" style="margin-bottom:.5rem">Exportar CSV</div>
+    <a href="/relatorios/vendas.csv" style="display:block;padding:.4rem .75rem;background:#1cc88a;color:#fff;border-radius:4px;text-decoration:none;font-size:.85rem;margin-bottom:.4rem">
+      Vendas (período atual)
+    </a>
+    <a href="/relatorios/estoque.csv" style="display:block;padding:.4rem .75rem;background:#1cc88a;color:#fff;border-radius:4px;text-decoration:none;font-size:.85rem">
+      Estoque Atual
+    </a>
+  </div>
 </div>
 
 <div class="dash-two-col">
@@ -117,7 +126,7 @@
 </div>
 
 <div class="dash-section">
-  <h2>Estoque Baixo (≤ 5 unidades)</h2>
+  <h2>Alertas de Estoque</h2>
   <div class="mini-kpi-grid" style="margin-bottom:1rem">
     <div class="mini-kpi">
       <div class="val">{{ estoque_total_ativos }}</div>
@@ -125,32 +134,51 @@
     </div>
     <div class="mini-kpi {% if estoque_baixo_count > 0 %}alerta{% endif %}">
       <div class="val">{{ estoque_baixo_count }}</div>
-      <div class="lbl">Estoque Baixo (1–5)</div>
+      <div class="lbl">Abaixo do Mínimo</div>
     </div>
     <div class="mini-kpi {% if estoque_zerado_count > 0 %}alerta{% endif %}">
       <div class="val">{{ estoque_zerado_count }}</div>
       <div class="lbl">Zerados</div>
     </div>
   </div>
-  {% if estoque_baixo %}
-  <table class="est-table">
+
+  {% if estoque_zerado %}
+  <h3 style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#e74c3c;margin:.5rem 0">Zerados</h3>
+  <table class="est-table" style="margin-bottom:1.25rem">
     <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Qtd</th></tr></thead>
+    <tbody>
+    {% for p in estoque_zerado %}
+      <tr>
+        <td><code>{{ p.sku }}</code></td>
+        <td><a href="{% url 'admin:produtos_produto_change' p.pk %}">{{ p.nome }}</a></td>
+        <td>{{ p.categoria.nome|default:"—" }}</td>
+        <td><span class="badge badge-danger">Zerado</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if estoque_baixo %}
+  <h3 style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#f39c12;margin:.5rem 0">Abaixo do Estoque Mínimo</h3>
+  <table class="est-table">
+    <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Atual</th><th>Mínimo</th></tr></thead>
     <tbody>
     {% for p in estoque_baixo %}
       <tr>
         <td><code>{{ p.sku }}</code></td>
         <td><a href="{% url 'admin:produtos_produto_change' p.pk %}">{{ p.nome }}</a></td>
         <td>{{ p.categoria.nome|default:"—" }}</td>
-        <td>
-          {% if p.estoque_total <= 0 %}<span class="badge badge-danger">Zerado</span>
-          {% else %}<span class="badge badge-warning">{{ p.estoque_total }}</span>{% endif %}
-        </td>
+        <td><span class="badge badge-warning">{{ p.estoque_total }}</span></td>
+        <td>{{ p.estoque_minimo }}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% else %}
-    <p style="color:var(--body-quiet-color)">Nenhum produto com estoque baixo.</p>
+  {% endif %}
+
+  {% if not estoque_zerado and not estoque_baixo %}
+    <p style="color:var(--body-quiet-color)">Nenhum alerta de estoque.</p>
   {% endif %}
 </div>
 

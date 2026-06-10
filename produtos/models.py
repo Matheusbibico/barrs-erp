@@ -59,6 +59,7 @@ class Produto(TimeStampedModel):
     custo = models.DecimalField('Custo (R$)', max_digits=10, decimal_places=2, default=0)
     preco_venda = models.DecimalField('Preço de Venda (R$)', max_digits=10, decimal_places=2)
     estoque_total = models.IntegerField('Estoque Total', default=0)
+    estoque_minimo = models.IntegerField('Estoque Mínimo', default=0)
     fornecedor = models.ForeignKey(
         Fornecedor,
         on_delete=models.SET_NULL,
@@ -99,6 +100,7 @@ class VariacaoProduto(TimeStampedModel):
     custo = models.DecimalField('Custo (R$)', max_digits=10, decimal_places=2, default=0)
     preco_venda = models.DecimalField('Preço de Venda (R$)', max_digits=10, decimal_places=2, default=0)
     estoque = models.IntegerField('Estoque', default=0)
+    estoque_minimo = models.IntegerField('Estoque Mínimo', default=0)
     site_id = models.IntegerField('ID no Site', null=True, blank=True, db_index=True)
     ativo = models.BooleanField('Ativo', default=True)
 

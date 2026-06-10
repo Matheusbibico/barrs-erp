@@ -58,7 +58,7 @@ class FornecedorAdmin(ModelAdmin):
 class VariacaoProdutoInline(TabularInline):
     model = VariacaoProduto
     extra = 1
-    fields = ('cor', 'tamanho', 'sku_variacao', 'custo', 'preco_venda', 'estoque', 'ativo')
+    fields = ('cor', 'tamanho', 'sku_variacao', 'custo', 'preco_venda', 'estoque', 'estoque_minimo', 'ativo')
 
 
 @admin.register(Produto)
@@ -86,7 +86,7 @@ class ProdutoAdmin(ModelAdmin):
             'fields': ('custo', 'preco_venda'),
         }),
         ('Estoque', {
-            'fields': ('estoque_total',),
+            'fields': ('estoque_total', 'estoque_minimo'),
         }),
         ('Datas', {
             'fields': ('criado_em', 'atualizado_em'),
@@ -121,6 +121,6 @@ class VariacaoProdutoAdmin(ModelAdmin):
             'fields': ('cor', 'tamanho', 'sku_variacao', 'ativo'),
         }),
         ('Preços e Estoque', {
-            'fields': ('custo', 'preco_venda', 'estoque'),
+            'fields': ('custo', 'preco_venda', 'estoque', 'estoque_minimo'),
         }),
     )

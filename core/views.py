@@ -1,3 +1,4 @@
+import csv
 import hmac
 import json
 import logging
@@ -8,7 +9,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -67,15 +68,24 @@ def dashboard(request):
     )
     clientes_ativos = Cliente.objects.filter(ativo=True).count()
 
+    from django.db.models import F as _Fstock
+    estoque_total_ativos = Produto.objects.filter(status='ativo').count()
+    estoque_zerado = (
+        Produto.objects
+        .filter(status='ativo', estoque_total__lte=0)
+        .select_related('categoria')
+        .order_by('nome')[:10]
+    )
     estoque_baixo = (
         Produto.objects
-        .filter(status='ativo', estoque_total__lte=5)
+        .filter(status='ativo', estoque_total__gt=0, estoque_minimo__gt=0,
+                estoque_total__lte=_Fstock('estoque_minimo'))
         .select_related('categoria')
         .order_by('estoque_total')[:10]
     )
-    estoque_total_ativos = Produto.objects.filter(status='ativo').count()
     estoque_baixo_count = Produto.objects.filter(
-        status='ativo', estoque_total__gt=0, estoque_total__lte=5
+        status='ativo', estoque_total__gt=0, estoque_minimo__gt=0,
+        estoque_total__lte=_Fstock('estoque_minimo')
     ).count()
     estoque_zerado_count = Produto.objects.filter(
         status='ativo', estoque_total__lte=0
@@ -156,6 +166,7 @@ def dashboard(request):
         'ticket_medio_mes': ticket_medio_mes,
         'clientes_ativos': clientes_ativos,
         'estoque_baixo': estoque_baixo,
+        'estoque_zerado': estoque_zerado,
         'estoque_total_ativos': estoque_total_ativos,
         'estoque_baixo_count': estoque_baixo_count,
         'estoque_zerado_count': estoque_zerado_count,
@@ -196,6 +207,91 @@ def webhook_nova_venda(request):
         return JsonResponse({'status': 'error', 'detail': 'Internal server error'}, status=500)
 
     return JsonResponse({'status': 'ok', 'criado': criado, 'pedido_id': str(pedido.id)})
+
+
+@staff_member_required
+def relatorio_vendas_csv(request):
+    inicio = request.GET.get('inicio')
+    fim = request.GET.get('fim')
+
+    qs = Pedido.objects.select_related('cliente').prefetch_related('itens__produto')
+    if inicio:
+        qs = qs.filter(criado_em__date__gte=inicio)
+    if fim:
+        qs = qs.filter(criado_em__date__lte=fim)
+    qs = qs.order_by('criado_em')
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="vendas.csv"'
+    response.write('﻿')  # BOM para Excel
+
+    writer = csv.writer(response)
+    writer.writerow(['Data', 'Pedido', 'Cliente', 'Canal', 'Status', 'Total (R$)', 'Itens'])
+
+    status_labels = dict(Pedido.STATUS_CHOICES)
+    canal_labels = dict(Pedido.CANAL_CHOICES)
+
+    for pedido in qs:
+        itens_resumo = '; '.join(
+            f'{item.produto.nome} x{item.quantidade}'
+            for item in pedido.itens.all()
+        )
+        writer.writerow([
+            pedido.criado_em.strftime('%d/%m/%Y'),
+            str(pedido.id)[:8].upper(),
+            pedido.cliente.nome,
+            canal_labels.get(pedido.canal, pedido.canal),
+            status_labels.get(pedido.status, pedido.status),
+            f'{pedido.total_liquido:.2f}'.replace('.', ','),
+            itens_resumo,
+        ])
+
+    return response
+
+
+@staff_member_required
+def relatorio_estoque_csv(request):
+    from produtos.models import VariacaoProduto
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="estoque.csv"'
+    response.write('﻿')  # BOM para Excel
+
+    writer = csv.writer(response)
+    writer.writerow(['SKU', 'Produto', 'Variação', 'Estoque Atual', 'Estoque Mínimo', 'Custo (R$)', 'Preço Venda (R$)'])
+
+    produtos = (
+        Produto.objects
+        .filter(status='ativo')
+        .prefetch_related('variacoes')
+        .order_by('nome')
+    )
+
+    for produto in produtos:
+        variacoes = list(produto.variacoes.filter(ativo=True))
+        if variacoes:
+            for var in variacoes:
+                writer.writerow([
+                    var.sku_variacao,
+                    produto.nome,
+                    f'{var.cor} / {var.tamanho}'.strip(' /'),
+                    var.estoque,
+                    var.estoque_minimo,
+                    f'{var.custo:.2f}'.replace('.', ','),
+                    f'{var.preco_venda:.2f}'.replace('.', ','),
+                ])
+        else:
+            writer.writerow([
+                produto.sku,
+                produto.nome,
+                '',
+                produto.estoque_total,
+                produto.estoque_minimo,
+                f'{produto.custo:.2f}'.replace('.', ','),
+                f'{produto.preco_venda:.2f}'.replace('.', ','),
+            ])
+
+    return response
 
 
 def _importar_pedido_unico(site_id):

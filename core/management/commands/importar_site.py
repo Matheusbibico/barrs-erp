@@ -52,23 +52,21 @@ class Command(BaseCommand):
         for sc in SiteCategoria.objects.using('site').all():
             try:
                 cat, created = Categoria.objects.get_or_create(
-                    slug=sc.slug, defaults={'nome': sc.nome},
+                    nome=sc.nome,
                 )
                 if created:
                     criadas += 1
                 else:
-                    cat.nome = sc.nome
-                    cat.save(update_fields=['nome'])
                     atualizadas += 1
             except Exception as exc:
-                self.stderr.write(self.style.ERROR(f'  Categoria {sc.slug}: {exc}'))
+                self.stderr.write(self.style.ERROR(f'  Categoria {sc.nome}: {exc}'))
                 erros += 1
         return {'criadas': criadas, 'atualizadas': atualizadas, 'erros': erros}
 
     def _importar_produtos(self):
         self.stdout.write('Importando produtos...')
         criados = atualizados = erros = 0
-        cat_map = {c.slug: c for c in Categoria.objects.all()}
+        cat_map = {c.nome: c for c in Categoria.objects.all()}
 
         Produto.objects.get_or_create(
             sku='SITE-DESCONHECIDO',
@@ -84,7 +82,7 @@ class Command(BaseCommand):
             try:
                 sku = (sp.codigo_interno or '').strip() or f'SITE-{sp.id}'
                 status = Produto.STATUS_ATIVO if sp.visivel else Produto.STATUS_INATIVO
-                cat = cat_map.get(sp.categoria.slug) if sp.categoria else None
+                cat = cat_map.get(sp.categoria.nome) if sp.categoria else None
 
                 prod, created = Produto.objects.get_or_create(
                     site_id=sp.id,

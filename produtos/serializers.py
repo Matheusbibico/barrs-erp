@@ -29,7 +29,6 @@ class VariacaoProdutoSerializer(serializers.ModelSerializer):
 class ProdutoSerializer(serializers.ModelSerializer):
     fotos = FotoProdutoSerializer(many=True, read_only=True)
     variacoes = VariacaoProdutoSerializer(many=True, read_only=True)
-    estoque_disponivel = serializers.ReadOnlyField()
     margem = serializers.ReadOnlyField()
     categoria_nome = serializers.CharField(source='categoria.nome', read_only=True)
     fornecedor_nome = serializers.CharField(source='fornecedor.nome', read_only=True)
@@ -41,11 +40,10 @@ class ProdutoSerializer(serializers.ModelSerializer):
 
 class ProdutoListSerializer(serializers.ModelSerializer):
     categoria_nome = serializers.CharField(source='categoria.nome', read_only=True)
-    estoque_disponivel = serializers.ReadOnlyField()
 
     class Meta:
         model = Produto
         fields = (
             'id', 'sku', 'nome', 'categoria_nome', 'preco_venda',
-            'custo', 'estoque_total', 'estoque_reservado', 'estoque_disponivel', 'status',
+            'custo', 'estoque_total', 'status',
         )

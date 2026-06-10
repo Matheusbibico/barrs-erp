@@ -42,7 +42,7 @@ class ProdutoViewSet(viewsets.ModelViewSet):
         if status:
             qs = qs.filter(status=status)
         if categoria:
-            qs = qs.filter(categoria__slug=categoria)
+            qs = qs.filter(categoria__nome__icontains=categoria)
         return qs
 
     @action(detail=False, methods=['get'])

@@ -170,7 +170,7 @@ def dre(request):
     else:
         fim = date(ano, mes + 1, 1) - timedelta(days=1)
 
-    from pedidos.models import ItemPedido, LucroPedido, Pedido
+    from pedidos.models import ItemPedido, Pedido
 
     receita_bruta = (
         Pedido.objects
@@ -178,10 +178,13 @@ def dre(request):
         .aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
     )
 
+    from django.db.models import DecimalField, ExpressionWrapper, F as _F
     cmv = (
-        LucroPedido.objects
+        ItemPedido.objects
         .filter(pedido__status='pago', pedido__criado_em__date__gte=inicio, pedido__criado_em__date__lte=fim)
-        .aggregate(v=Sum('custo_produtos'))['v'] or Decimal('0')
+        .aggregate(
+            v=Sum(ExpressionWrapper(_F('custo_unitario') * _F('quantidade'), output_field=DecimalField(max_digits=12, decimal_places=2)))
+        )['v'] or Decimal('0')
     )
 
     lucro_bruto = receita_bruta - cmv

@@ -2,17 +2,17 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Pedido, ItemPedido, Pagamento, LucroPedido, EventoRastreio, Devolucao, ItemDevolucao
+from .models import Pedido, ItemPedido, Pagamento, Devolucao, ItemDevolucao
 from .serializers import (
     PedidoSerializer, PedidoListSerializer, PedidoCreateSerializer,
-    ItemPedidoSerializer, PagamentoSerializer, LucroPedidoSerializer,
-    EventoRastreioSerializer, DevolucaoSerializer, ItemDevolucaoSerializer,
+    ItemPedidoSerializer, PagamentoSerializer,
+    DevolucaoSerializer, ItemDevolucaoSerializer,
 )
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.select_related('cliente', 'usuario').prefetch_related(
-        'itens', 'itens__variacao', 'pagamentos', 'eventos_rastreio'
+        'itens', 'itens__variacao', 'pagamentos'
     )
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['cliente__nome', 'cliente__whatsapp']
@@ -75,23 +75,6 @@ class ItemPedidoViewSet(viewsets.ModelViewSet):
 class PagamentoViewSet(viewsets.ModelViewSet):
     queryset = Pagamento.objects.select_related('pedido')
     serializer_class = PagamentoSerializer
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        pedido = self.request.query_params.get('pedido')
-        if pedido:
-            qs = qs.filter(pedido_id=pedido)
-        return qs
-
-
-class LucroPedidoViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = LucroPedido.objects.select_related('pedido', 'pedido__cliente')
-    serializer_class = LucroPedidoSerializer
-
-
-class EventoRastreioViewSet(viewsets.ModelViewSet):
-    queryset = EventoRastreio.objects.select_related('pedido')
-    serializer_class = EventoRastreioSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()

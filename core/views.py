@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from clientes.models import Cliente
 from core.site_models import SitePedido
 from financeiro.models import LancamentoCaixa
-from pedidos.models import ItemPedido, LucroPedido, Pagamento, Pedido
+from pedidos.models import ItemPedido, Pagamento, Pedido
 from produtos.models import Produto, VariacaoProduto
 
 logger = logging.getLogger(__name__)
@@ -48,10 +48,15 @@ def dashboard(request):
         Pedido.objects.filter(status='pago', criado_em__date__gte=inicio_mes)
         .aggregate(v=Sum('total_liquido'))['v'] or Decimal('0')
     )
-    lucro_mes = (
-        LucroPedido.objects.filter(pedido__criado_em__date__gte=inicio_mes)
-        .aggregate(v=Sum('lucro_liquido'))['v'] or Decimal('0')
+    from django.db.models import DecimalField, ExpressionWrapper, F as _F
+    custo_mes = (
+        ItemPedido.objects
+        .filter(pedido__status='pago', pedido__criado_em__date__gte=inicio_mes)
+        .aggregate(
+            v=Sum(ExpressionWrapper(_F('custo_unitario') * _F('quantidade'), output_field=DecimalField(max_digits=12, decimal_places=2)))
+        )['v'] or Decimal('0')
     )
+    lucro_mes = faturamento_mes - custo_mes
     pedidos_pendentes = Pedido.objects.filter(
         status__in=['orcamento', 'aguardando_pagamento'],
     ).count()
@@ -92,23 +97,25 @@ def dashboard(request):
         .annotate(total=Sum('total_liquido'))
         .order_by('dia')
     )
-    lucro_qs = (
-        LucroPedido.objects
-        .filter(pedido__criado_em__date__gte=trinta_dias_atras)
+    from django.db.models import DecimalField, ExpressionWrapper, F as _F2
+    custo_qs = (
+        ItemPedido.objects
+        .filter(pedido__status='pago', pedido__criado_em__date__gte=trinta_dias_atras)
         .annotate(dia=TruncDate('pedido__criado_em'))
         .values('dia')
-        .annotate(total=Sum('lucro_liquido'))
+        .annotate(custo=Sum(ExpressionWrapper(_F2('custo_unitario') * _F2('quantidade'), output_field=DecimalField(max_digits=12, decimal_places=2))))
         .order_by('dia')
     )
     vendas_dict = {v['dia']: float(v['total']) for v in vendas_qs}
-    lucro_dict = {v['dia']: float(v['total']) for v in lucro_qs}
+    custo_dict = {v['dia']: float(v['custo']) for v in custo_qs}
 
     labels, dados, dados_lucro = [], [], []
     dia = trinta_dias_atras
     while dia <= hoje:
         labels.append(dia.strftime('%d/%m'))
-        dados.append(vendas_dict.get(dia, 0))
-        dados_lucro.append(lucro_dict.get(dia, 0))
+        vendas_dia = vendas_dict.get(dia, 0)
+        dados.append(vendas_dia)
+        dados_lucro.append(vendas_dia - custo_dict.get(dia, 0))
         dia += timedelta(days=1)
 
     _CANAL_LABELS = {

@@ -18,6 +18,7 @@
 | S6 | Limpeza do sistema — remoção de modelos e campos desnecessários | ✅ |
 | S7 | `estoque_minimo` em Produto/Variação, exportação CSV de vendas e estoque | ✅ |
 | S8 | Meta mensal com barra de progresso, atalhos rápidos no dashboard | ✅ |
+| S9 | Webhook Mercado Pago — confirma pagamento automaticamente no ERP | ✅ |
 
 ---
 
@@ -109,18 +110,36 @@
 
 #### Tarefas
 
-- [ ] **[BE]** Criar endpoint `POST /webhooks/mercadopago/` para receber notificações de pagamento
-- [ ] **[BE]** Ao receber notificação de pagamento aprovado:
+- [x] **[BE]** Criar endpoint `POST /webhooks/mercadopago/` para receber notificações de pagamento
+- [x] **[BE]** Ao receber notificação de pagamento aprovado:
   - Localizar `Pedido` pelo `external_reference` (= `site_id`)
   - Mudar status para `pago`
   - Criar `Pagamento` com método e valor
-  - Criar `LancamentoCaixa` de entrada automaticamente
-- [ ] **[BE]** Validar assinatura do webhook (header `x-signature` do MP)
-- [ ] **[BE]** Documentar no `sprints.md` como configurar a chave no Railway
+  - `LancamentoCaixa` criado automaticamente via signal existente
+- [x] **[BE]** Validar assinatura do webhook (header `x-signature` do MP)
+- [x] **[BE]** Configuração no Railway documentada abaixo
 
 #### Critério de aceite
 - Pedido pago no site muda para status "pago" no ERP sem intervenção manual
 - Tentativa de falsificação do webhook é rejeitada
+
+#### Configuração no Railway
+
+1. **Variáveis de ambiente** — adicionar em Railway → seu serviço → Variables:
+   ```
+   MP_ACCESS_TOKEN=APP_USR-xxxxxxxxxxxx   ← token de produção da sua conta MP
+   MP_WEBHOOK_SECRET=chave-secreta-criada-no-dashboard-mp
+   ```
+
+2. **URL do webhook** — no dashboard do Mercado Pago:
+   - Ir em "Suas integrações" → "Webhooks" → "Adicionar"
+   - URL: `https://seu-app.railway.app/webhook/mercadopago/`
+   - Eventos: marcar **Pagamentos** (`payment`)
+   - Copiar a **Chave secreta** gerada e colocar em `MP_WEBHOOK_SECRET`
+
+3. **external_reference** — o site precisa enviar `external_reference` igual ao ID do pedido no site (campo `site_id` do `Pedido` no ERP). Confirmar que o checkout do site passa esse campo na criação do pagamento MP.
+
+4. **Obter o Access Token** — MP Dashboard → "Suas integrações" → selecionar app → "Credenciais de produção" → copiar Access Token.
 
 ---
 

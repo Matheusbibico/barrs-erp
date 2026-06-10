@@ -237,6 +237,87 @@ def webhook_nova_venda(request):
     return JsonResponse({'status': 'ok', 'criado': criado, 'pedido_id': str(pedido.id)})
 
 
+_MP_METODO_MAP = {
+    'pix': Pagamento.METODO_PIX,
+    'credit_card': Pagamento.METODO_CREDITO,
+    'debit_card': Pagamento.METODO_DEBITO,
+    'bolbradesco': Pagamento.METODO_BOLETO,
+    'pec': Pagamento.METODO_BOLETO,
+    'account_money': Pagamento.METODO_TRANSFERENCIA,
+}
+
+
+@csrf_exempt
+@require_POST
+def webhook_mercadopago(request):
+    from core.mercadopago import buscar_pagamento, validar_assinatura
+    from django.db import transaction
+
+    if not validar_assinatura(request):
+        logger.warning('MP webhook: assinatura inválida')
+        return JsonResponse({'status': 'error', 'detail': 'Invalid signature'}, status=401)
+
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'detail': 'Invalid JSON'}, status=400)
+
+    if body.get('type') != 'payment':
+        return JsonResponse({'status': 'ok', 'detail': 'ignored'})
+
+    payment_id = body.get('data', {}).get('id')
+    if not payment_id:
+        return JsonResponse({'status': 'error', 'detail': 'Missing payment id'}, status=400)
+
+    try:
+        pag_mp = buscar_pagamento(payment_id)
+    except Exception:
+        logger.exception('MP webhook: falha ao buscar pagamento %s', payment_id)
+        return JsonResponse({'status': 'error', 'detail': 'Failed to fetch payment'}, status=500)
+
+    if pag_mp.get('status') != 'approved':
+        return JsonResponse({'status': 'ok', 'detail': 'payment not approved'})
+
+    external_ref = pag_mp.get('external_reference')
+    if not external_ref:
+        logger.warning('MP webhook: payment %s sem external_reference', payment_id)
+        return JsonResponse({'status': 'ok', 'detail': 'no external_reference'})
+
+    try:
+        site_id = int(external_ref)
+    except (ValueError, TypeError):
+        return JsonResponse({'status': 'ok', 'detail': 'external_reference inválido'})
+
+    try:
+        pedido = Pedido.objects.get(site_id=site_id)
+    except Pedido.DoesNotExist:
+        logger.warning('MP webhook: pedido site_id=%s não encontrado', site_id)
+        return JsonResponse({'status': 'ok', 'detail': 'pedido not found'})
+
+    if pedido.status == Pedido.STATUS_PAGO:
+        return JsonResponse({'status': 'ok', 'detail': 'already paid', 'pedido_id': str(pedido.id)})
+
+    metodo = _MP_METODO_MAP.get(pag_mp.get('payment_method_id', ''), Pagamento.METODO_TRANSFERENCIA)
+    valor = Decimal(str(pag_mp.get('transaction_amount') or pedido.total_liquido))
+
+    with transaction.atomic():
+        pedido.status = Pedido.STATUS_PAGO
+        pedido.save(update_fields=['status'])
+
+        Pagamento.objects.get_or_create(
+            pedido=pedido,
+            defaults={
+                'metodo': metodo,
+                'valor': valor,
+                'status': Pagamento.STATUS_APROVADO,
+                'pago_em': timezone.now(),
+            },
+        )
+
+    logger.info('MP webhook: pedido %s marcado como pago (payment %s)', pedido.id, payment_id)
+    return JsonResponse({'status': 'ok', 'pedido_id': str(pedido.id)})
+
+
 @staff_member_required
 def relatorio_vendas_csv(request):
     inicio = request.GET.get('inicio')

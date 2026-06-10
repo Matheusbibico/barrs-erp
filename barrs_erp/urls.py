@@ -3,12 +3,16 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from core.views import dashboard, relatorio_estoque_csv, relatorio_vendas_csv, webhook_nova_venda
+from core.views import (
+    dashboard, relatorio_estoque_csv, relatorio_vendas_csv,
+    webhook_mercadopago, webhook_nova_venda,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', dashboard, name='dashboard'),
     path('webhook/nova-venda/', webhook_nova_venda, name='webhook_nova_venda'),
+    path('webhook/mercadopago/', webhook_mercadopago, name='webhook_mercadopago'),
     path('relatorios/vendas.csv', relatorio_vendas_csv, name='relatorio_vendas_csv'),
     path('relatorios/estoque.csv', relatorio_estoque_csv, name='relatorio_estoque_csv'),
     path('api/', include([

@@ -115,6 +115,10 @@ CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bo
 
 WEBHOOK_TOKEN = config('WEBHOOK_TOKEN', default='')
 
+# Mercado Pago — configurar no Railway
+MP_ACCESS_TOKEN = config('MP_ACCESS_TOKEN', default='')
+MP_WEBHOOK_SECRET = config('MP_WEBHOOK_SECRET', default='')
+
 # ─── Unfold Admin ────────────────────────────────────────────────────────────
 # Paleta Barrs: neutros quentes (bege/marrom) + verde primário
 # Cores em oklch (Oklab Lightness Chroma Hue) — formato exigido pelo Unfold 0.90+

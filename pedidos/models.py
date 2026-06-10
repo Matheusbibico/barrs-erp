@@ -19,10 +19,8 @@ class Pedido(TimeStampedModel):
     ]
 
     STATUS_ORCAMENTO = 'orcamento'
-    STATUS_RESERVADO = 'reservado'
     STATUS_AGUARDANDO = 'aguardando_pagamento'
     STATUS_PAGO = 'pago'
-    STATUS_SEPARACAO = 'separacao'
     STATUS_ENVIADO = 'enviado'
     STATUS_ENTREGUE = 'entregue'
     STATUS_CANCELADO = 'cancelado'
@@ -30,10 +28,8 @@ class Pedido(TimeStampedModel):
     STATUS_DEVOLVIDO = 'devolvido'
     STATUS_CHOICES = [
         (STATUS_ORCAMENTO, 'Orçamento'),
-        (STATUS_RESERVADO, 'Reservado'),
         (STATUS_AGUARDANDO, 'Aguardando Pagamento'),
         (STATUS_PAGO, 'Pago'),
-        (STATUS_SEPARACAO, 'Em Separação'),
         (STATUS_ENVIADO, 'Enviado'),
         (STATUS_ENTREGUE, 'Entregue'),
         (STATUS_TROCA_PENDENTE, 'Troca Pendente'),
@@ -94,6 +90,14 @@ class Pedido(TimeStampedModel):
         if self.pk and not kwargs.get('update_fields'):
             self.total_liquido = self.total_bruto - self.desconto + self.frete
         super().save(*args, **kwargs)
+
+    @property
+    def lucro_calculado(self):
+        custo = sum(
+            item.custo_unitario * item.quantidade
+            for item in self.itens.all()
+        )
+        return self.total_liquido - custo
 
 
 class ItemPedido(TimeStampedModel):

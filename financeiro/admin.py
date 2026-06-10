@@ -93,10 +93,9 @@ class ContaPagarAdmin(ModelAdmin):
 @admin.register(CategoriaFinanceira)
 class CategoriaFinanceiraAdmin(ModelAdmin):
     compressed_fields = True
-    list_display = ('nome', 'tipo', 'pai')
+    list_display = ('nome', 'tipo')
     list_filter = ('tipo',)
     search_fields = ('nome',)
-    list_select_related = ('pai',)
 
 
 _TIPO_COR = {

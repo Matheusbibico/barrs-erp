@@ -12,14 +12,6 @@ class CategoriaFinanceira(TimeStampedModel):
 
     nome = models.CharField('Nome', max_length=100)
     tipo = models.CharField('Tipo', max_length=10, choices=TIPO_CHOICES)
-    pai = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='subcategorias',
-        verbose_name='Categoria Pai',
-    )
 
     class Meta:
         verbose_name = 'Categoria Financeira'
@@ -27,8 +19,6 @@ class CategoriaFinanceira(TimeStampedModel):
         ordering = ['tipo', 'nome']
 
     def __str__(self):
-        if self.pai:
-            return f'{self.pai.nome} › {self.nome}'
         return self.nome
 
 

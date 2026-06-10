@@ -1230,3 +1230,102 @@ div[class*="border-t"]:has(.cursor-pointer) {
   font-size: 12px !important;
   padding: 10px 16px !important;
 }
+
+/* ══ Tipografia global — corrige Unfold/Tailwind herdado ════════════
+   Problema: Unfold injeta classes Tailwind (text-base, font-medium)
+   diretamente em td > a e h2, quebrando o font-size que definimos na
+   regra do elemento pai (table, fieldset). Precisamos travar em cada
+   nível explicitamente.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Células da tabela — 14px explícito em td e td a ─────────── */
+#main #result_list td {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  font-weight: 400 !important;
+}
+
+#main #result_list td a {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+/* Tailwind text-* dentro de células: trava no mesmo 14px */
+#main #result_list td .text-xs  { font-size: 11px !important; }
+#main #result_list td .text-sm  { font-size: 12px !important; }
+#main #result_list td .text-base { font-size: 14px !important; }
+#main #result_list td .text-lg,
+#main #result_list td .text-xl,
+#main #result_list td .text-2xl { font-size: 14px !important; }
+
+/* ── 2. Primeira coluna clicável — mesmo tamanho, apenas bold ────── */
+#main #result_list td:first-child a {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Badges e códigos internos mantêm tamanho próprio */
+#main #result_list .bd-badge,
+#main #result_list .barrs-status {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+#main #result_list .bd-order-id {
+  font-size: 12.5px !important;
+}
+
+/* ── 3. Header das colunas — uniformiza th e th a ───────────────── */
+#main #result_list th,
+#main #result_list th a,
+#main #result_list th a:hover {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: var(--b-muted) !important;
+  line-height: 1 !important;
+}
+
+/* ── 4. Fieldset titles — Unfold pode renderizar como h2 com classes
+        Tailwind (text-base, font-semibold) fora do <fieldset> tag. ─ */
+#main fieldset h2,
+#main h2.text-sm,
+#main h2.text-base,
+#main h2.text-lg,
+#main h2.font-medium,
+#main h2.font-semibold,
+#main h2[class*="text-"],
+#main h2[class*="font-"] {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--b-muted) !important;
+  line-height: 1.2 !important;
+}
+
+/* ── 5. Submit row — trava tamanho e altura em todas as variantes ── */
+#main .submit-row input[type="submit"],
+#main .submit-row input[type="button"],
+#main .submit-row a,
+#main .submit-row button,
+#main .submit-row a[class*="bg-"],
+#main .submit-row button[class*="bg-"] {
+  font-size: 13px !important;
+  height: 38px !important;
+  max-height: 38px !important;
+  line-height: 38px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* Tailwind text-* dentro do submit-row */
+#main .submit-row .text-sm,
+#main .submit-row .text-base,
+#main .submit-row .text-lg {
+  font-size: 13px !important;
+}

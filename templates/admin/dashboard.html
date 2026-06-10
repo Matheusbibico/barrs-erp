@@ -63,6 +63,22 @@
     <div class="kpi-value">{{ clientes_ativos }}</div>
     <div class="kpi-label">Clientes Ativos</div>
   </div>
+  <div class="kpi-card {% if saldo_caixa < 0 %}alerta{% endif %}">
+    <div class="kpi-value">R$ {{ saldo_caixa|floatformat:2 }}</div>
+    <div class="kpi-label"><a href="/api/financeiro/fluxo-caixa/" style="color:inherit;text-decoration:none;">Saldo em Caixa</a></div>
+  </div>
+</div>
+
+<div class="kpi-grid" style="margin-bottom:1.5rem">
+  <div class="kpi-card" style="text-align:left">
+    <div class="kpi-label" style="margin-bottom:.5rem">Relatórios Financeiros</div>
+    <a href="/api/financeiro/fluxo-caixa/" style="display:block;padding:.4rem .75rem;background:var(--primary,#007bff);color:#fff;border-radius:4px;text-decoration:none;font-size:.85rem;margin-bottom:.4rem">
+      Fluxo de Caixa
+    </a>
+    <a href="/api/financeiro/dre/" style="display:block;padding:.4rem .75rem;background:var(--primary,#007bff);color:#fff;border-radius:4px;text-decoration:none;font-size:.85rem">
+      DRE — Demonstrativo de Resultado
+    </a>
+  </div>
 </div>
 
 <div class="dash-two-col">

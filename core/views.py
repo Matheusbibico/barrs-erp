@@ -16,6 +16,7 @@ from django.views.decorators.http import require_POST
 
 from clientes.models import Cliente
 from core.site_models import SitePedido
+from financeiro.models import LancamentoCaixa
 from pedidos.models import ItemPedido, LucroPedido, Pagamento, Pedido
 from produtos.models import Produto, VariacaoProduto
 
@@ -124,6 +125,13 @@ def dashboard(request):
     canal_labels = [_CANAL_LABELS.get(v['canal'], v['canal']) for v in canal_qs]
     canal_dados = [float(v['total']) for v in canal_qs]
 
+    from django.db.models import Q as _Q
+    saldo_caixa_agg = LancamentoCaixa.objects.aggregate(
+        entradas=Sum('valor', filter=_Q(tipo='entrada')),
+        saidas=Sum('valor', filter=_Q(tipo='saida')),
+    )
+    saldo_caixa = (saldo_caixa_agg['entradas'] or Decimal('0')) - (saldo_caixa_agg['saidas'] or Decimal('0'))
+
     return render(request, 'admin/dashboard.html', {
         'title': 'Dashboard',
         'faturamento_hoje': faturamento_hoje,
@@ -142,6 +150,7 @@ def dashboard(request):
         'grafico_lucro': json.dumps(dados_lucro),
         'vendas_canal_labels': json.dumps(canal_labels),
         'vendas_canal_dados': json.dumps(canal_dados),
+        'saldo_caixa': saldo_caixa,
     })
 
 

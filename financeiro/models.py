@@ -2,6 +2,90 @@ from django.db import models
 from core.models import TimeStampedModel
 
 
+class CategoriaFinanceira(TimeStampedModel):
+    TIPO_RECEITA = 'receita'
+    TIPO_DESPESA = 'despesa'
+    TIPO_CHOICES = [
+        (TIPO_RECEITA, 'Receita'),
+        (TIPO_DESPESA, 'Despesa'),
+    ]
+
+    nome = models.CharField('Nome', max_length=100)
+    tipo = models.CharField('Tipo', max_length=10, choices=TIPO_CHOICES)
+    pai = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subcategorias',
+        verbose_name='Categoria Pai',
+    )
+
+    class Meta:
+        verbose_name = 'Categoria Financeira'
+        verbose_name_plural = 'Categorias Financeiras'
+        ordering = ['tipo', 'nome']
+
+    def __str__(self):
+        if self.pai:
+            return f'{self.pai.nome} › {self.nome}'
+        return self.nome
+
+
+class LancamentoCaixa(TimeStampedModel):
+    TIPO_ENTRADA = 'entrada'
+    TIPO_SAIDA = 'saida'
+    TIPO_CHOICES = [
+        (TIPO_ENTRADA, 'Entrada'),
+        (TIPO_SAIDA, 'Saída'),
+    ]
+
+    data = models.DateField('Data')
+    tipo = models.CharField('Tipo', max_length=10, choices=TIPO_CHOICES)
+    valor = models.DecimalField('Valor (R$)', max_digits=12, decimal_places=2)
+    categoria = models.ForeignKey(
+        CategoriaFinanceira,
+        on_delete=models.PROTECT,
+        related_name='lancamentos',
+        verbose_name='Categoria',
+    )
+    descricao = models.CharField('Descrição', max_length=200)
+    pedido = models.ForeignKey(
+        'pedidos.Pedido',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='lancamentos_caixa',
+        verbose_name='Pedido',
+    )
+    conta_receber = models.ForeignKey(
+        'ContaReceber',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='lancamentos',
+        verbose_name='Conta a Receber',
+    )
+    conta_pagar = models.ForeignKey(
+        'ContaPagar',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='lancamentos',
+        verbose_name='Conta a Pagar',
+    )
+    conciliado = models.BooleanField('Conciliado', default=False)
+
+    class Meta:
+        verbose_name = 'Lançamento de Caixa'
+        verbose_name_plural = 'Lançamentos de Caixa'
+        ordering = ['-data', '-criado_em']
+
+    def __str__(self):
+        sinal = '+' if self.tipo == self.TIPO_ENTRADA else '-'
+        return f'{self.data} {sinal}R$ {self.valor} — {self.descricao}'
+
+
 class ContaReceber(TimeStampedModel):
     STATUS_PENDENTE = 'pendente'
     STATUS_RECEBIDO = 'recebido'

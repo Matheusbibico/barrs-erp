@@ -8,10 +8,28 @@
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrahead %}
-{# Preload da fonte Material Symbols — elimina FOUC (ícones aparecendo como texto) #}
+{# ── Preconnect: acelera DNS+TLS para recursos externos se necessário ── #}
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+{# ── Preload: Material Symbols carrega junto com o HTML, não depois ── #}
 <link rel="preload"
       href="{% static 'unfold/fonts/material-symbols/Material-Symbols-Outlined.woff2' %}"
       as="font" type="font/woff2" crossorigin="anonymous">
+
+{# ── CSS crítico inline: aplicado no primeiro paint, antes do CSS externo ──
+   Garante que: (a) fundo e cor já sejam os corretos antes dos arquivos
+   de CSS carregarem; (b) Material Symbols nunca herda fonte errada. #}
+<style>
+  html { background: #F9FAFB; color: #111827; color-scheme: light; }
+  .material-symbols-outlined,
+  .material-symbols-rounded,
+  .material-symbols-sharp {
+    font-family: 'Material Symbols Outlined' !important;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+  }
+</style>
+
+{# ── Script: força tema light antes do Alpine.js inicializar ── #}
 <script>
 (function(){
   try {

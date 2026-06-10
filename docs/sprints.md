@@ -31,16 +31,16 @@
 
 #### O que remover/simplificar
 
-- [ ] **[BE]** Remover `EventoRastreio` da sidebar e tornar o model inativo no admin
-- [ ] **[BE]** Remover `ParcelaPagamento` do fluxo principal — modelo de parcelamento é overhead desnecessário para uma loja pequena onde o parcelamento fica com a maquininha/gateway
-- [ ] **[BE]** Substituir `LucroPedido` (model separado) por propriedade calculada: `Pedido.lucro_calculado` = `total_liquido - soma(custo_unitario × quantidade dos itens)`
-- [ ] **[BE]** Remover `FotoProduto` do admin — adicionar campo `imagem_url` (URLField, opcional) diretamente em `Produto`
-- [ ] **[BE]** Remover campo `pai` de `CategoriaFinanceira` — categorias simples são suficientes
-- [ ] **[BE]** Remover status `reservado` e `separacao` de `Pedido` — na prática não são usados
-- [ ] **[BE]** Remover `estoque_reservado` de `Produto` — nunca é atualizado automaticamente, campo morto
-- [ ] **[BE]** Remover `Categoria.slug` — slug é para URL pública, não tem uso no ERP interno
-- [ ] **[BE]** Simplificar sidebar: retirar `EventoRastreio`, `LancamentoCaixa` de Eventos de Rastreio e itens raramente acessados
-- [ ] **[BE]** Substituir app `compras` por tela simples de "Entrada de Estoque" (produto + qtd + custo + fornecedor → MovimentoEstoque)
+- [x] **[BE]** Remover `EventoRastreio` da sidebar e tornar o model inativo no admin
+- [x] **[BE]** Remover `ParcelaPagamento` do fluxo principal — modelo de parcelamento é overhead desnecessário para uma loja pequena onde o parcelamento fica com a maquininha/gateway
+- [x] **[BE]** Substituir `LucroPedido` (model separado) por propriedade calculada: `Pedido.lucro_calculado` = `total_liquido - soma(custo_unitario × quantidade dos itens)`
+- [x] **[BE]** Remover `FotoProduto` do admin — adicionar campo `imagem_url` (URLField, opcional) diretamente em `Produto`
+- [x] **[BE]** Remover campo `pai` de `CategoriaFinanceira` — categorias simples são suficientes
+- [x] **[BE]** Remover status `reservado` e `separacao` de `Pedido` — na prática não são usados
+- [x] **[BE]** Remover `estoque_reservado` de `Produto` — nunca é atualizado automaticamente, campo morto
+- [x] **[BE]** Remover `Categoria.slug` — slug é para URL pública, não tem uso no ERP interno
+- [x] **[BE]** Simplificar sidebar: retirar `EventoRastreio`, `LancamentoCaixa` de Eventos de Rastreio e itens raramente acessados
+- [x] **[BE]** Substituir app `compras` por tela simples de "Entrada de Estoque" (produto + qtd + custo + fornecedor → MovimentoEstoque)
 
 #### Critério de aceite
 - Admin mais limpo: sidebar com no máximo 10 itens visíveis

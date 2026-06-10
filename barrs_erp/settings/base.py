@@ -210,12 +210,6 @@ UNFOLD = {
                         "permission": lambda request: request.user.is_staff,
                     },
                     {
-                        "title": "Categorias",
-                        "icon": "label",
-                        "link": reverse_lazy("admin:produtos_categoria_changelist"),
-                        "permission": lambda request: request.user.is_staff,
-                    },
-                    {
                         "title": "Clientes",
                         "icon": "groups",
                         "link": reverse_lazy("admin:clientes_cliente_changelist"),
@@ -229,7 +223,7 @@ UNFOLD = {
                 "collapsible": False,
                 "items": [
                     {
-                        "title": "Movimentos de Estoque",
+                        "title": "Entrada de Estoque",
                         "icon": "warehouse",
                         "link": reverse_lazy("admin:estoque_movimentoestoque_changelist"),
                         "permission": lambda request: request.user.is_staff,
@@ -262,18 +256,6 @@ UNFOLD = {
                         "title": "Fornecedores",
                         "icon": "local_shipping",
                         "link": reverse_lazy("admin:produtos_fornecedor_changelist"),
-                        "permission": lambda request: request.user.is_staff,
-                    },
-                    {
-                        "title": "Pedidos de Compra",
-                        "icon": "shopping_cart",
-                        "link": reverse_lazy("admin:compras_pedidocompra_changelist"),
-                        "permission": lambda request: request.user.is_staff,
-                    },
-                    {
-                        "title": "Recebimentos",
-                        "icon": "inventory",
-                        "link": reverse_lazy("admin:compras_recebimentomercadoria_changelist"),
                         "permission": lambda request: request.user.is_staff,
                     },
                 ],

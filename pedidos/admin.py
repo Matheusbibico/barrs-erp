@@ -11,10 +11,8 @@ from .models import (
 # Cores Barrs para cada status de pedido
 _STATUS_PEDIDO_COR = {
     'orcamento':           '#9E9488',
-    'reservado':           '#6B95B8',
     'aguardando_pagamento': '#C8A040',
     'pago':                '#8A947C',
-    'separacao':           '#7BA3C0',
     'enviado':             '#B8962A',
     'entregue':            '#6BA080',
     'troca_pendente':      '#A87CC0',

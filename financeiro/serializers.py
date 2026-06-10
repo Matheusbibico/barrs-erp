@@ -22,7 +22,6 @@ class ContaPagarSerializer(serializers.ModelSerializer):
 
 
 class CategoriaFinanceiraSerializer(serializers.ModelSerializer):
-    pai_nome = serializers.CharField(source='pai.nome', read_only=True)
 
     class Meta:
         model = CategoriaFinanceira

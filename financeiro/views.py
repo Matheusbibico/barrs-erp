@@ -67,7 +67,7 @@ class ContaPagarViewSet(viewsets.ModelViewSet):
 
 
 class CategoriaFinanceiraViewSet(viewsets.ModelViewSet):
-    queryset = CategoriaFinanceira.objects.select_related('pai')
+    queryset = CategoriaFinanceira.objects.all()
     serializer_class = CategoriaFinanceiraSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['nome']

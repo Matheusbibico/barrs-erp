@@ -53,7 +53,7 @@ def dashboard(request):
         .aggregate(v=Sum('lucro_liquido'))['v'] or Decimal('0')
     )
     pedidos_pendentes = Pedido.objects.filter(
-        status__in=['orcamento', 'reservado', 'aguardando_pagamento'],
+        status__in=['orcamento', 'aguardando_pagamento'],
     ).count()
 
     ticket_medio_mes = (

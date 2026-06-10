@@ -16,7 +16,7 @@ def dashboard_callback(request, context):
     hoje = timezone.localdate()
     mes_inicio = hoje.replace(day=1)
 
-    STATUS_FATURADOS = ['pago', 'separacao', 'enviado', 'entregue']
+    STATUS_FATURADOS = ['pago', 'enviado', 'entregue']
 
     pedidos_hoje = Pedido.objects.filter(criado_em__date=hoje).count()
     pedidos_mes = Pedido.objects.filter(criado_em__date__gte=mes_inicio).count()

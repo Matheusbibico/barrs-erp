@@ -32,7 +32,6 @@ class Command(BaseCommand):
             ))
             return
 
-        post_save.disconnect(pedido_signals.calcular_lucro_pedido, sender=Pedido)
         post_save.disconnect(pedido_signals.atualizar_historico_cliente, sender=Pedido)
         try:
             stats = {
@@ -42,7 +41,6 @@ class Command(BaseCommand):
                 'pedidos':    self._importar_pedidos(),
             }
         finally:
-            post_save.connect(pedido_signals.calcular_lucro_pedido, sender=Pedido)
             post_save.connect(pedido_signals.atualizar_historico_cliente, sender=Pedido)
         self._relatorio(stats)
 

@@ -143,7 +143,7 @@ class ContaPagar(TimeStampedModel):
         verbose_name='Fornecedor',
     )
     valor = models.DecimalField('Valor (R$)', max_digits=12, decimal_places=2)
-    vencimento = models.DateField('Vencimento')
+    vencimento = models.DateField('Vencimento', null=True, blank=True)
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
     pago_em = models.DateField('Pago em', null=True, blank=True)
     observacoes = models.TextField('Observações', blank=True)

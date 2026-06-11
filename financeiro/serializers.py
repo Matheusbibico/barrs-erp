@@ -13,7 +13,7 @@ class ContaReceberSerializer(serializers.ModelSerializer):
 
 
 class ContaPagarSerializer(serializers.ModelSerializer):
-    fornecedor_nome = serializers.CharField(source='fornecedor.nome', read_only=True)
+    fornecedor_nome = serializers.CharField(source='fornecedor.nome', read_only=True, allow_null=True, default=None)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:

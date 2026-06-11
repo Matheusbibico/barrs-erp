@@ -62,20 +62,18 @@ class ContaPagarAdmin(ModelAdmin):
     warn_unsaved_form = True
     list_fullwidth = True
     list_display = (
-        'categoria', 'descricao', 'fornecedor',
-        'valor', 'status_badge', 'vencimento', 'pago_em',
+        'categoria', 'descricao',
+        'valor', 'status_badge', 'pago_em',
     )
-    list_filter = ('status', 'categoria', 'vencimento')
-    search_fields = ('descricao', 'categoria', 'fornecedor__nome')
-    list_select_related = ('fornecedor',)
-    date_hierarchy = 'vencimento'
+    list_filter = ('status', 'categoria')
+    search_fields = ('descricao', 'categoria')
     readonly_fields = ('criado_em', 'atualizado_em')
     fieldsets = (
         ('Conta', {
-            'fields': ('categoria', 'descricao', 'fornecedor', 'valor'),
+            'fields': ('categoria', 'descricao', 'valor'),
         }),
         ('Status', {
-            'fields': ('status', 'vencimento', 'pago_em'),
+            'fields': ('status', 'pago_em'),
         }),
         ('Observações', {
             'fields': ('observacoes',),

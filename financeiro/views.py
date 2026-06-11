@@ -40,11 +40,11 @@ class ContaReceberViewSet(viewsets.ModelViewSet):
 
 
 class ContaPagarViewSet(viewsets.ModelViewSet):
-    queryset = ContaPagar.objects.select_related('fornecedor')
+    queryset = ContaPagar.objects.all()
     serializer_class = ContaPagarSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['descricao', 'categoria', 'fornecedor__nome']
-    ordering_fields = ['vencimento', 'valor']
+    search_fields = ['descricao', 'categoria']
+    ordering_fields = ['valor']
 
     def get_queryset(self):
         qs = super().get_queryset()

@@ -251,12 +251,6 @@ UNFOLD = {
                         "permission": lambda request: request.user.is_staff,
                     },
                     {
-                        "title": "Categorias Financeiras",
-                        "icon": "category",
-                        "link": reverse_lazy("admin:financeiro_categoriafinanceira_changelist"),
-                        "permission": lambda request: request.user.is_staff,
-                    },
-                    {
                         "title": "Fornecedores",
                         "icon": "local_shipping",
                         "link": reverse_lazy("admin:produtos_fornecedor_changelist"),

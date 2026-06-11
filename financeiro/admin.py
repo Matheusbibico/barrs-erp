@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q, Sum
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
@@ -123,6 +124,25 @@ class LancamentoCaixaAdmin(ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context)
+        try:
+            qs = response.context_data['cl'].queryset
+            totais = qs.aggregate(
+                entradas=Sum('valor', filter=Q(tipo='entrada')),
+                saidas=Sum('valor', filter=Q(tipo='saida')),
+            )
+            entradas = totais['entradas'] or 0
+            saidas = totais['saidas'] or 0
+            response.context_data['totais_lancamento'] = {
+                'entradas': entradas,
+                'saidas': saidas,
+                'saldo': entradas - saidas,
+            }
+        except (AttributeError, KeyError):
+            pass
+        return response
 
     @admin.display(description='Tipo', ordering='tipo')
     def tipo_badge(self, obj):

@@ -1,0 +1,22 @@
+{% extends "unfold/change_list.html" %}
+{% load i18n %}
+
+{% block content %}
+{% if totais_lancamento %}
+<div style="display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap">
+  <div style="flex:1;min-width:160px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:1rem 1.25rem">
+    <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:#166534;font-weight:600;margin-bottom:.25rem">Total Entradas</div>
+    <div style="font-size:1.4rem;font-weight:700;color:#15803d">R$&nbsp;{{ totais_lancamento.entradas|floatformat:2 }}</div>
+  </div>
+  <div style="flex:1;min-width:160px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem 1.25rem">
+    <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:#991b1b;font-weight:600;margin-bottom:.25rem">Total Saídas</div>
+    <div style="font-size:1.4rem;font-weight:700;color:#dc2626">R$&nbsp;{{ totais_lancamento.saidas|floatformat:2 }}</div>
+  </div>
+  <div style="flex:1;min-width:160px;background:{% if totais_lancamento.saldo >= 0 %}#f0fdf4;border:1px solid #bbf7d0{% else %}#fef2f2;border:1px solid #fecaca{% endif %};border-radius:8px;padding:1rem 1.25rem">
+    <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:{% if totais_lancamento.saldo >= 0 %}#166534{% else %}#991b1b{% endif %};font-weight:600;margin-bottom:.25rem">Saldo do Período</div>
+    <div style="font-size:1.4rem;font-weight:700;color:{% if totais_lancamento.saldo >= 0 %}#15803d{% else %}#dc2626{% endif %}">R$&nbsp;{{ totais_lancamento.saldo|floatformat:2 }}</div>
+  </div>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

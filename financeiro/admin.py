@@ -103,6 +103,7 @@ class LancamentoCaixaAdmin(ModelAdmin):
     compressed_fields = True
     warn_unsaved_form = True
     list_fullwidth = True
+    list_before_template = 'admin/financeiro/lancamentocaixa/totais.html'
     list_display = (
         'data', 'tipo_badge', 'descricao',
         'valor', 'conciliado', 'pedido',

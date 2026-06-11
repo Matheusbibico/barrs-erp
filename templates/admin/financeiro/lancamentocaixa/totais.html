@@ -1,7 +1,3 @@
-{% extends "unfold/change_list.html" %}
-{% load i18n %}
-
-{% block content %}
 {% if totais_lancamento %}
 <div style="display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap">
   <div style="flex:1;min-width:160px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:1rem 1.25rem">
@@ -18,5 +14,3 @@
   </div>
 </div>
 {% endif %}
-{{ block.super }}
-{% endblock %}

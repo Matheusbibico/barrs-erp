@@ -1228,3 +1228,59 @@ body > nav.rounded-default a:hover {
 #main .formset-wrapper > div.dark\:bg-base-800 {
   background-color: var(--b-border, #E5E7EB) !important;
 }
+
+/* ── Widgets related (produto/variacao) — botões "+" e lupa ──────────
+   dark:bg-base-900 ativa quando html.dark está presente; precisamos
+   forçar fundo claro nesses botões dentro do inline.                  */
+#main .related-widget-wrapper,
+#main .related-widget-wrapper-link {
+  background-color: transparent !important;
+}
+
+#main [class*="dark:bg-base-9"],
+#main [class*="dark:bg-base-8"] {
+  background-color: var(--b-surface, #FFFFFF) !important;
+  border-color: var(--b-border, #E5E7EB) !important;
+  color: var(--b-text, #111827) !important;
+}
+
+/* Botões de ação do related widget (ícones de lupa/edição) */
+#main a.view-related,
+#main a.change-related,
+#main a.add-related,
+#main a.delete-related {
+  background-color: var(--b-surface, #FFFFFF) !important;
+  border-color: var(--b-border, #E5E7EB) !important;
+  color: var(--b-muted, #6B7280) !important;
+}
+
+#main a.view-related:hover,
+#main a.change-related:hover,
+#main a.add-related:hover {
+  background-color: var(--b-primary-bg, #F0FDF4) !important;
+  color: var(--b-primary, #2E5219) !important;
+}
+
+/* ── Submit row (barra salvar) — compacta e fundo claro ─────────────
+   dark:bg-base-900/80 deixa a barra escura; lg:h-[64px] e w-full
+   no botão fazem ela parecer muito grande.                            */
+#submit-row > div {
+  background-color: rgba(255, 253, 248, 0.92) !important;
+  border-top: 1px solid var(--b-border, #E5E7EB) !important;
+  backdrop-filter: blur(8px);
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+#submit-row > div > div {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+#submit-row button[type="submit"],
+#submit-row input[type="submit"] {
+  width: auto !important;
+  min-width: 120px;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}

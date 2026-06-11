@@ -35,7 +35,9 @@ class LancamentoCaixa(TimeStampedModel):
     valor = models.DecimalField('Valor (R$)', max_digits=12, decimal_places=2)
     categoria = models.ForeignKey(
         CategoriaFinanceira,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='lancamentos',
         verbose_name='Categoria',
     )

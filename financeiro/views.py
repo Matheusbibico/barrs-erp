@@ -74,10 +74,10 @@ class CategoriaFinanceiraViewSet(viewsets.ModelViewSet):
 
 
 class LancamentoCaixaViewSet(viewsets.ModelViewSet):
-    queryset = LancamentoCaixa.objects.select_related('categoria', 'pedido', 'conta_receber', 'conta_pagar')
+    queryset = LancamentoCaixa.objects.select_related('pedido', 'conta_receber', 'conta_pagar')
     serializer_class = LancamentoCaixaSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['descricao', 'categoria__nome']
+    search_fields = ['descricao']
     ordering_fields = ['data', 'valor']
 
     def get_queryset(self):
@@ -192,7 +192,7 @@ def dre(request):
     despesas_qs = (
         LancamentoCaixa.objects
         .filter(tipo='saida', data__gte=inicio, data__lte=fim)
-        .values('categoria__nome')
+        .values('descricao')
         .annotate(total=Sum('valor'))
         .order_by('-total')
     )
@@ -206,7 +206,7 @@ def dre(request):
         'cmv': float(cmv),
         'lucro_bruto': float(lucro_bruto),
         'despesas': [
-            {'categoria': d['categoria__nome'], 'total': float(d['total'])}
+            {'categoria': d['descricao'], 'total': float(d['total'])}
             for d in despesas_qs
         ],
         'total_despesas': float(total_despesas),

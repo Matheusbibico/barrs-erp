@@ -19,12 +19,10 @@
     <head>
         <title>{{ environment_title_prefix|default:"" }} {% block title %}{% endblock %}</title>
 
-        {# ── Preload de fonte crítica — posição 1, antes de qualquer CSS/JS ─── #}
         <link rel="preload"
               href="{% static 'unfold/fonts/material-symbols/Material-Symbols-Outlined.woff2' %}"
               as="font" type="font/woff2" crossorigin="anonymous">
 
-        {# ── CSS crítico inline — primeiro paint correto sem aguardar arquivos ─ #}
         <style>
           html { background: #F9FAFB; color: #111827; color-scheme: light; }
           @font-face {
@@ -42,11 +40,9 @@
           }
         </style>
 
-        {# ── Fontes locais ─────────────────────────────────────────────────── #}
         <link href="{% static "unfold/fonts/inter/styles.css" %}" rel="stylesheet">
         <link href="{% static "unfold/fonts/material-symbols/styles.css" %}" rel="stylesheet">
 
-        {# ── CSS customizado (UNFOLD["STYLES"]) ───────────────────────────── #}
         {% for style in styles %}
             <link href="{{ style }}" rel="stylesheet">
         {% endfor %}
@@ -55,27 +51,16 @@
             <link {% if favicon.rel %}rel="{{ favicon.rel }}"{% endif %} {% if favicon.href %}href="{{ favicon.href }}"{% endif %} {% if favicon.type %}type="{{ favicon.type }}"{% endif %} {% if favicon.sizes %}sizes="{{ favicon.sizes }}"{% endif %}>
         {% endfor %}
 
-        {# ── CSS do Unfold (Tailwind) ─────────────────────────────────────── #}
         <link href="{% static 'unfold/css/styles.css' %}" rel="stylesheet">
         <link href="{% static 'unfold/css/simplebar/simplebar.css' %}" rel="stylesheet">
 
-        {# ── app.js PRIMEIRO — define theme() antes do Alpine inicializar ────
-           Alpine processa x-data="theme()" no <html>; se app.js rodar depois
-           do alpine.js, theme() não existe ainda e a sidebar some. Com defer
-           e posição anterior ao alpine.js, executa em ordem correta. #}
         <script src="{% static 'unfold/js/app.js' %}" defer></script>
-
-        {# ── JS Alpine — defer, após app.js ──────────────────────────────── #}
         <script src="{% static 'unfold/js/alpine/alpine.anchor.js' %}" defer></script>
         <script src="{% static 'unfold/js/alpine/alpine.persist.js' %}" defer></script>
         <script src="{% static 'unfold/js/alpine/alpine.sort.js' %}" defer></script>
         <script src="{% static 'unfold/js/alpine/alpine.resize.js' %}" defer></script>
         <script src="{% static 'unfold/js/alpine/alpine.js' %}" defer></script>
-
-        {# ── htmx — defer (50 KB, era bloqueante) ────────────────────────── #}
         <script src="{% static 'unfold/js/htmx/htmx.js' %}" defer></script>
-
-        {# ── Chart.js — defer (196 KB, era o maior culpado) ──────────────── #}
         <script src="{% static 'unfold/js/chart/chart.js' %}" defer></script>
 
         {% for script in scripts %}
@@ -118,7 +103,6 @@
 
         {% include "unfold/helpers/command.html" %}
 
-        {# ── simplebar — defer (era bloqueante; 27 KB) ───────────────────── #}
         <script src="{% static 'unfold/js/simplebar/simplebar.js' %}" defer></script>
     </body>
 </html>

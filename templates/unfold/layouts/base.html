@@ -8,9 +8,6 @@
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrahead %}
-{# Preload e CSS crítico movidos para skeleton.html (posição 1 no <head>). #}
-
-{# ── Script: força tema light antes do Alpine.js inicializar ── #}
 <script>
 (function(){
   try {

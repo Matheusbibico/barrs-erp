@@ -103,17 +103,17 @@ class LancamentoCaixaAdmin(ModelAdmin):
     warn_unsaved_form = True
     list_fullwidth = True
     list_display = (
-        'data', 'tipo_badge', 'descricao', 'categoria',
+        'data', 'tipo_badge', 'descricao',
         'valor', 'conciliado', 'pedido',
     )
-    list_filter = ('tipo', 'conciliado', 'categoria', 'data')
-    search_fields = ('descricao', 'categoria__nome')
-    list_select_related = ('categoria', 'pedido', 'conta_receber', 'conta_pagar')
+    list_filter = ('tipo', 'conciliado', 'data')
+    search_fields = ('descricao',)
+    list_select_related = ('pedido', 'conta_receber', 'conta_pagar')
     date_hierarchy = 'data'
     readonly_fields = ('criado_em', 'atualizado_em')
     fieldsets = (
         ('Lançamento', {
-            'fields': ('data', 'tipo', 'valor', 'categoria', 'descricao', 'conciliado'),
+            'fields': ('data', 'tipo', 'valor', 'descricao', 'conciliado'),
         }),
         ('Vínculos', {
             'fields': ('pedido', 'conta_receber', 'conta_pagar'),

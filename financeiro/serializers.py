@@ -29,7 +29,7 @@ class CategoriaFinanceiraSerializer(serializers.ModelSerializer):
 
 
 class LancamentoCaixaSerializer(serializers.ModelSerializer):
-    categoria_nome = serializers.CharField(source='categoria.nome', read_only=True)
+    categoria_nome = serializers.CharField(source='categoria.nome', read_only=True, allow_null=True, default=None)
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
 
     class Meta:

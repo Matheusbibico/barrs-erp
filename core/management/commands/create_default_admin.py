@@ -10,11 +10,20 @@ class Command(BaseCommand):
         User = get_user_model()
         username = os.environ.get('ADMIN_USERNAME', 'admin')
         email = os.environ.get('ADMIN_EMAIL', 'admin@barrs.com.br')
-        password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+        password = os.environ.get('ADMIN_PASSWORD', '')
 
         if User.objects.filter(username=username).exists():
             self.stdout.write(
                 self.style.WARNING(f'Superusuário "{username}" já existe — ignorando.')
+            )
+            return
+
+        if not password:
+            self.stdout.write(
+                self.style.ERROR(
+                    'ADMIN_PASSWORD não definida — superusuário NÃO criado. '
+                    'Defina a variável de ambiente ADMIN_PASSWORD no Railway.'
+                )
             )
             return
 

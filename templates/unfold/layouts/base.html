@@ -13,9 +13,21 @@
   try {
     localStorage.setItem('adminTheme', '"light"');
     localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
-    document.documentElement.dataset.theme = 'light';
+    var h = document.documentElement;
+    h.classList.remove('dark');
+    h.classList.add('light');
+    h.dataset.theme = 'light';
+
+    // Impede que o Alpine.js ou qualquer script coloque class="dark" no <html>
+    new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.attributeName === 'class' && h.classList.contains('dark')) {
+          h.classList.remove('dark');
+          h.classList.add('light');
+          try { localStorage.setItem('adminTheme', '"light"'); } catch(e) {}
+        }
+      });
+    }).observe(h, { attributes: true, attributeFilter: ['class'] });
   } catch (e) {}
 })();
 </script>

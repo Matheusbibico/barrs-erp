@@ -225,7 +225,6 @@ class Command(BaseCommand):
                         'total_liquido': sp.total,
                         'endereco_entrega': endereco,
                         'codigo_rastreio': sp.codigo_rastreio or '',
-                        'transportadora': sp.transportadora or '',
                     },
                 )
                 if created:
@@ -255,9 +254,6 @@ class Command(BaseCommand):
                     if sp.codigo_rastreio and not ped.codigo_rastreio:
                         ped.codigo_rastreio = sp.codigo_rastreio
                         update_fields.append('codigo_rastreio')
-                    if sp.transportadora and not ped.transportadora:
-                        ped.transportadora = sp.transportadora
-                        update_fields.append('transportadora')
                     if endereco and not ped.endereco_entrega:
                         ped.endereco_entrega = endereco
                         update_fields.append('endereco_entrega')

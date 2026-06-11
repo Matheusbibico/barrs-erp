@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
-from .models import CategoriaFinanceira, ContaPagar, ContaReceber, LancamentoCaixa, MetaMensal
+from .models import ContaPagar, ContaReceber, LancamentoCaixa, MetaMensal
 
 _STATUS_COR = {
     'pendente':  '#C8A040',
@@ -89,13 +89,6 @@ class ContaPagarAdmin(ModelAdmin):
     def status_badge(self, obj):
         return _badge(obj)
 
-
-@admin.register(CategoriaFinanceira)
-class CategoriaFinanceiraAdmin(ModelAdmin):
-    compressed_fields = True
-    list_display = ('nome', 'tipo')
-    list_filter = ('tipo',)
-    search_fields = ('nome',)
 
 
 _TIPO_COR = {

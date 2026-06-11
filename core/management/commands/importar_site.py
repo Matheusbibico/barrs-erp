@@ -141,6 +141,43 @@ class Command(BaseCommand):
                 erros += 1
         return {'criadas': criados, 'atualizadas': atualizados, 'erros': erros}
 
+    # Mapeamento de forma_pagamento do site para métodos do ERP
+    _FORMA_PAG_MAP = {
+        'pix': Pagamento.METODO_PIX,
+        'cartao_credito': Pagamento.METODO_CREDITO,
+        'cartão de crédito': Pagamento.METODO_CREDITO,
+        'cartao_debito': Pagamento.METODO_DEBITO,
+        'cartão de débito': Pagamento.METODO_DEBITO,
+        'boleto': Pagamento.METODO_BOLETO,
+        'dinheiro': Pagamento.METODO_DINHEIRO,
+        'transferencia': Pagamento.METODO_TRANSFERENCIA,
+        'transferência': Pagamento.METODO_TRANSFERENCIA,
+    }
+
+    def _metodo_pagamento(self, forma):
+        if not forma:
+            return Pagamento.METODO_PIX
+        return self._FORMA_PAG_MAP.get(forma.lower().strip(), Pagamento.METODO_PIX)
+
+    def _endereco_entrega(self, sp):
+        partes = []
+        if sp.logradouro:
+            linha = sp.logradouro
+            if sp.numero:
+                linha += f', {sp.numero}'
+            if sp.complemento:
+                linha += f' — {sp.complemento}'
+            partes.append(linha)
+        if sp.bairro:
+            partes.append(sp.bairro)
+        if sp.cidade and sp.estado:
+            partes.append(f'{sp.cidade}/{sp.estado}')
+        elif sp.cidade:
+            partes.append(sp.cidade)
+        if sp.cep:
+            partes.append(f'CEP {sp.cep}')
+        return '\n'.join(partes)
+
     def _importar_pedidos(self):
         self.stdout.write('Importando pedidos...')
         criados = atualizados = erros = 0
@@ -148,7 +185,15 @@ class Command(BaseCommand):
         placeholder = Produto.objects.get(sku='SITE-DESCONHECIDO')
         cli_email_map = {c.email: c for c in Cliente.objects.exclude(email='')}
 
-        for sp in SitePedido.objects.using('site').prefetch_related('itens__produto'):
+        try:
+            qs = SitePedido.objects.using('site').prefetch_related('itens__produto')
+            # força avaliação para detectar colunas inexistentes logo
+            list(qs[:1])
+        except Exception as exc:
+            self.stderr.write(self.style.ERROR(f'Erro ao ler pedidos do site: {exc}'))
+            return {'criadas': 0, 'atualizadas': 0, 'erros': 1}
+
+        for sp in qs:
             try:
                 status_erp = STATUS_MAP.get(sp.status, Pedido.STATUS_ORCAMENTO)
                 cliente = cli_email_map.get(sp.email)
@@ -165,6 +210,9 @@ class Command(BaseCommand):
                     if sp.email:
                         cli_email_map[sp.email] = cliente
 
+                endereco = self._endereco_entrega(sp)
+                metodo = self._metodo_pagamento(sp.forma_pagamento)
+
                 ped, created = Pedido.objects.get_or_create(
                     site_id=sp.id,
                     defaults={
@@ -175,6 +223,9 @@ class Command(BaseCommand):
                         'desconto': sp.desconto,
                         'frete': sp.frete,
                         'total_liquido': sp.total,
+                        'endereco_entrega': endereco,
+                        'codigo_rastreio': sp.codigo_rastreio or '',
+                        'transportadora': sp.transportadora or '',
                     },
                 )
                 if created:
@@ -192,15 +243,25 @@ class Command(BaseCommand):
                         Pagamento.objects.get_or_create(
                             pedido=ped,
                             defaults={
-                                'metodo': Pagamento.METODO_PIX,
+                                'metodo': metodo,
                                 'valor': sp.total,
                                 'status': Pagamento.STATUS_APROVADO,
                             },
                         )
                 else:
+                    update_fields = ['status', 'total_liquido']
                     ped.status = status_erp
                     ped.total_liquido = sp.total
-                    ped.save(update_fields=['status', 'total_liquido'])
+                    if sp.codigo_rastreio and not ped.codigo_rastreio:
+                        ped.codigo_rastreio = sp.codigo_rastreio
+                        update_fields.append('codigo_rastreio')
+                    if sp.transportadora and not ped.transportadora:
+                        ped.transportadora = sp.transportadora
+                        update_fields.append('transportadora')
+                    if endereco and not ped.endereco_entrega:
+                        ped.endereco_entrega = endereco
+                        update_fields.append('endereco_entrega')
+                    ped.save(update_fields=update_fields)
                     atualizados += 1
             except Exception as exc:
                 self.stderr.write(self.style.ERROR(f'  Pedido site_id={sp.id}: {exc}'))

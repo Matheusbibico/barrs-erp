@@ -1277,10 +1277,29 @@ body > nav.rounded-default a:hover {
   min-height: 0 !important;
 }
 
-#submit-row button[type="submit"],
+/* Todos os botões da barra (Salvar, Salvar e continuar, Salvar e adicionar,
+   Fechar, Apagar) — compactos, largura pelo conteúdo, nunca full-width. */
+#submit-row button,
+#submit-row a,
 #submit-row input[type="submit"] {
   width: auto !important;
-  min-width: 120px;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
+  flex: 0 0 auto !important;
+  font-size: 13px !important;
+  padding: 7px 16px !important;
+  line-height: 1.3 !important;
+}
+
+/* O container empilha em coluna no mobile com filhos w-full;
+   força linha horizontal compacta em qualquer largura de tela. */
+#submit-row > div > div {
+  flex-direction: row-reverse !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+#submit-row > div > div > div {
+  flex-direction: row !important;
+  width: auto !important;
+  gap: 8px !important;
 }

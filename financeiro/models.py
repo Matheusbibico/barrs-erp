@@ -148,6 +148,12 @@ class ContaPagar(TimeStampedModel):
     pago_em = models.DateField('Pago em', null=True, blank=True)
     observacoes = models.TextField('Observações', blank=True)
 
+    def save(self, *args, **kwargs):
+        if self.status == self.STATUS_PAGO and not self.pago_em:
+            from django.utils import timezone
+            self.pago_em = timezone.localdate()
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Conta a Pagar'
         verbose_name_plural = 'Contas a Pagar'

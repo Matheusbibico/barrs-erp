@@ -1189,3 +1189,42 @@ div[class*="border-t"]:has(.cursor-pointer) {
   border-color: var(--b-border) !important;
   color: var(--b-text) !important;
 }
+
+/* ── Dropdown (3 pontos) teleportado ao <body> pelo Alpine.js ─────────
+   O x-teleport="body" coloca o <nav> diretamente no body, fora de #main.
+   As regras acima não chegam aqui — precisamos de seletores globais.    */
+body > nav.rounded-default,
+body > div.rounded-default[data-simplebar] {
+  background-color: #FFFFFF !important;
+  border-color: var(--b-border, #E5E7EB) !important;
+  color: var(--b-text, #111827) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10) !important;
+}
+
+body > nav.rounded-default a,
+body > nav.rounded-default span:not(.material-symbols-outlined) {
+  color: var(--b-text, #111827) !important;
+}
+
+body > nav.rounded-default a:hover {
+  background-color: var(--b-primary-bg, #F0FDF4) !important;
+  color: var(--b-primary, #2E5219) !important;
+}
+
+/* ── Inline "Itens do Pedido" — cabeçalho e tabela ───────────────────
+   dark:bg-white/[.02] no h2 vira transparente; formset-wrapper usa
+   dark:bg-base-900 e dark:border-base-800 que ficam escuros.          */
+#main h2.bg-base-100 {
+  background-color: var(--b-surface-soft, #F9FAFB) !important;
+  color: var(--b-text, #111827) !important;
+}
+
+#main .formset-wrapper {
+  background-color: var(--b-surface, #FFFFFF) !important;
+  border-color: var(--b-border, #E5E7EB) !important;
+}
+
+#main .formset-wrapper > div.bg-base-200,
+#main .formset-wrapper > div.dark\:bg-base-800 {
+  background-color: var(--b-border, #E5E7EB) !important;
+}
